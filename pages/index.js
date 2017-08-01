@@ -1,7 +1,6 @@
 import values from '../values';
 import React, { Component } from 'react';
 import Page from '../components/page';
-import Person from '../components/person';
 import axios from 'axios';
 import Link from 'next/link';
 
@@ -28,11 +27,41 @@ export default class Index extends Component {
     render() {
         return (
             <Page>
-                {this.props.itens.map((item) => 
-                    <Person>
-                        {item.name}
-                    </Person>
-                )}
+                <div className="page-header">
+                    <h4>Sobreviventes</h4>
+                </div>
+                <table className="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Idade</th>
+                            <th>Gênero</th>
+                            <th>Infectado</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {this.props.itens.map((item) => 
+                            <tr>
+                                <td>
+                                    <Link 
+                                        key={item.location.split('/').pop()}
+                                        href={`/person?id=${item.location.split('/').pop()}`}
+                                        as={`/person/${item.location.split('/').pop()}`} >
+
+                                        <a>{item.name}</a>
+
+                                    </Link>
+                                </td>
+                                <td>{item.age}</td>
+                                <td>{item.gender === 'M' ? 'Masculino' : 'Feminino'}</td>
+                                <td>{item.infected ? 'Sim' : 'Não'}</td>
+                            </tr>    
+                        )}
+                    </tbody>
+
+                </table>
+
             </Page>
         );
     }

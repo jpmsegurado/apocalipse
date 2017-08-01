@@ -44,10 +44,6 @@ var _page = require('../components/page');
 
 var _page2 = _interopRequireDefault(_page);
 
-var _person = require('../components/person');
-
-var _person2 = _interopRequireDefault(_person);
-
 var _axios = require('axios');
 
 var _axios2 = _interopRequireDefault(_axios);
@@ -58,47 +54,61 @@ var _link2 = _interopRequireDefault(_link);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _jsxFileName = '/home/joaopedro/Documentos/ProjetosReact/apocalipse/pages/index.js?entry';
+var _jsxFileName = '/Users/joaopedro/apps/apocalipse/pages/person.js?entry';
 
 
-var Index = function (_Component) {
-    (0, _inherits3.default)(Index, _Component);
+var Person = function (_Component) {
+    (0, _inherits3.default)(Person, _Component);
 
-    function Index(props) {
-        (0, _classCallCheck3.default)(this, Index);
+    function Person(props) {
+        (0, _classCallCheck3.default)(this, Person);
 
-        return (0, _possibleConstructorReturn3.default)(this, (Index.__proto__ || (0, _getPrototypeOf2.default)(Index)).call(this, props));
+        return (0, _possibleConstructorReturn3.default)(this, (Person.__proto__ || (0, _getPrototypeOf2.default)(Person)).call(this, props));
     }
 
-    (0, _createClass3.default)(Index, [{
+    (0, _createClass3.default)(Person, [{
         key: 'render',
         value: function render() {
             return _react2.default.createElement(_page2.default, {
                 __source: {
                     fileName: _jsxFileName,
+                    lineNumber: 29
+                }
+            }, _react2.default.createElement('div', { className: 'row', __source: {
+                    fileName: _jsxFileName,
                     lineNumber: 30
                 }
-            }, this.props.itens.map(function (item) {
-                return _react2.default.createElement(_person2.default, {
-                    __source: {
-                        fileName: _jsxFileName,
-                        lineNumber: 32
-                    }
-                }, item.name);
-            }));
+            }, _react2.default.createElement('div', { className: 'col-xs-3', __source: {
+                    fileName: _jsxFileName,
+                    lineNumber: 31
+                }
+            }, _react2.default.createElement('div', { className: 'form-group', __source: {
+                    fileName: _jsxFileName,
+                    lineNumber: 32
+                }
+            }, _react2.default.createElement('label', {
+                __source: {
+                    fileName: _jsxFileName,
+                    lineNumber: 33
+                }
+            }, 'Nome'), _react2.default.createElement('input', { type: 'text', className: 'form-control', value: this.props.person.name, __source: {
+                    fileName: _jsxFileName,
+                    lineNumber: 34
+                }
+            })))));
         }
     }], [{
         key: 'getInitialProps',
         value: function () {
-            var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee() {
+            var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(args) {
                 return _regenerator2.default.wrap(function _callee$(_context) {
                     while (1) {
                         switch (_context.prev = _context.next) {
                             case 0:
-                                return _context.abrupt('return', _axios2.default.get(_values2.default.baseUrl + 'api/people.json').then(function (resp) {
-                                    var itens = resp.data.splice(0, 10);
+                                return _context.abrupt('return', _axios2.default.get(_values2.default.baseUrl + 'api/people/' + args.req.url.split('/').pop() + '.json').then(function (resp) {
+                                    var person = resp.data;
                                     return {
-                                        itens: itens
+                                        person: person
                                     };
                                 }, function () {
                                     return;
@@ -112,7 +122,7 @@ var Index = function (_Component) {
                 }, _callee, this);
             }));
 
-            function getInitialProps() {
+            function getInitialProps(_x) {
                 return _ref.apply(this, arguments);
             }
 
@@ -120,7 +130,7 @@ var Index = function (_Component) {
         }()
     }]);
 
-    return Index;
+    return Person;
 }(_react.Component);
 
-exports.default = Index;
+exports.default = Person;

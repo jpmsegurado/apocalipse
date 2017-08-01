@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "next",
+    "dev": "node server.js",
     "build": "next build",
     "start": "next start"
   },
@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.16.2",
-    "bootstrap": "^3.3.7",
+    "express": "^4.15.3",
     "next": "^3.0.1-beta.20",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
