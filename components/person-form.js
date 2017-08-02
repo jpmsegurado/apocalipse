@@ -19,7 +19,9 @@ export default class PersonForm extends Component {
 
     handleInputChange(event) {
         const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
+        let value = target.type === 'checkbox' ? target.checked : target.value;
+        if(target.type === 'number') value = parseInt(value);
+        if(value === 'true' || value === 'false') value = (value == 'true');
         const name = target.name;
         const person = Object.assign({}, this.state.person, { [name]: value });
 
