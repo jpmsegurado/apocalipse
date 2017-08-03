@@ -22,10 +22,17 @@ export default class Person extends Component {
         };
 
         return axios.get(`${values.baseUrl}api/people/${args.query.id}.json`).then((resp) => {
-            const person = resp.data;
-            return {
-                person: person
-            }
+
+            return axios.get(`${values.baseUrl}api/people/${args.query.id}/properties.json`).then((res) => {
+
+                let person = resp.data;
+                person.items = res.data;
+                return {
+                    person: person,
+                }
+
+            });
+
         }, () => {
             return;
         })
@@ -43,13 +50,28 @@ export default class Person extends Component {
 
         return (
             <Page>
-                <div className="page-header">
-                    <h4>
-                        Informações do sobrevivente
-                    </h4>
-                </div>
 
-                 <PersonForm person={this.props.person}></PersonForm> 
+                <style jsx>
+                    {`
+                        .margin-bottom {
+                            margin-bottom: 10px;
+                        }
+                    `}
+                </style>
+
+                <div className="col-xs-8 col-xs-offset-2">
+                    <div className="page-header">
+                        <h4>
+                            Informações do sobrevivente
+
+                            <Link href='/'>
+                                <button className="btn btn-link pull-right">Voltar para o início</button>
+                            </Link>
+                        </h4>
+                    </div>
+
+                    <PersonForm person={this.props.person}></PersonForm> 
+                </div>
 
             </Page>
         );
