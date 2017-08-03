@@ -22,9 +22,6 @@ export default class PersonForm extends Component {
     handleInputChange(event) {
         const target = event.target;
         let value = target.type === 'checkbox' ? target.checked : target.value;
-        if(target.type === 'number') value = parseInt(value);
-        if(value === 'true' || value === 'false') value = (value == 'true');
-        
         const name = target.name;
         
         if(name === 'infected') value = (value == 'true');
