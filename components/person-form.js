@@ -13,14 +13,20 @@ export default class PersonForm extends Component {
             person: props.person
         };
 
+        console.log(props.person);
+
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     handleInputChange(event) {
         const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
+        let value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
+        
+        if(name === 'infected') value = (value == 'true');
+        if(name === 'age') value = parseInt(value);
+
         const person = Object.assign({}, this.state.person, { [name]: value });
 
         this.setState({
@@ -30,8 +36,27 @@ export default class PersonForm extends Component {
     }
 
     handleSubmit(event) {
-        console.log(this.state.person);
         event.preventDefault();
+        this.setState({ loading: true });
+        
+        if(this.state.person.id) {
+            return axios.patch(`${values.baseUrl}api/people/${this.props.person.id}.json`, this.state.person).then(() => {
+                this.setState({ loading: false, success: true });
+                window.location.href = '/';
+            }, (err) => {
+                this.setState({ loading: false, error: true });
+            });
+        } else {
+            return axios.post(`${values.baseUrl}api/people.json`, Object.assign({}, this.state.person, {
+                items: ''
+            })).then(() => {
+                this.setState({ loading: false, success: true });
+                window.location.href = '/';
+            }, (err) => {
+                this.setState({ loading: false, error: true });
+            });
+        }
+
     }
 
 
@@ -52,6 +77,15 @@ export default class PersonForm extends Component {
                     input[type="radio"] {
                         margin: 0 5px 0 0;
                     }
+
+                    .fa {
+                        margin-left: 5px;
+                    }
+
+                    .alert {
+                        margin-top: 10px;
+                    }
+
                 `}</style>
 
                 <div className="col-xs-3">
@@ -84,7 +118,7 @@ export default class PersonForm extends Component {
                                     type="radio" 
                                     onChange={this.handleInputChange} 
                                     name="infected"
-                                    value="true"
+                                    value={true}
                                     checked={this.state.person.infected}/>
 
                                 Sim
@@ -95,7 +129,7 @@ export default class PersonForm extends Component {
                                     type="radio" 
                                     onChange={this.handleInputChange} 
                                     name="infected"
-                                    value="false"
+                                    value={false}
                                     checked={!this.state.person.infected}/>
 
                                 Não
@@ -131,7 +165,31 @@ export default class PersonForm extends Component {
                 </div>
 
                 <div className="col-xs-12">
-                    <button className="btn btn-primary btn-block">Salvar</button>
+                    <button className="btn btn-primary btn-block" disabled={this.state.loading}>
+                        Salvar
+
+                        {this.state.loading && (
+                            <i className="fa fa-spinner fa-spin"></i>
+                        )}
+                        
+                    </button>
+
+
+
+                    {this.state.error && !this.state.loading && (
+
+                        <div className="alert alert-danger" role="alert">
+                            Não foi possível salvar este sobrevivente no momento, tente novamente mais tarde.
+                        </div>
+                    )}
+
+                    {this.state.success && !this.state.loading && (
+                        <div className="alert alert-success" role="alert">
+                            Sobrevivente salvo com sucesso.
+                        </div>
+                    )}
+
+
                 </div>
 
             </form>

@@ -17,6 +17,10 @@ export default class Person extends Component {
 
     static async getInitialProps(args) {
 
+        if(!args.query.id) return {
+            person: {}
+        };
+
         return axios.get(`${values.baseUrl}api/people/${args.query.id}.json`).then((resp) => {
             const person = resp.data;
             return {
@@ -40,7 +44,9 @@ export default class Person extends Component {
         return (
             <Page>
                 <div className="page-header">
-                    <h4>Informações do sobrevivente</h4>
+                    <h4>
+                        Informações do sobrevivente
+                    </h4>
                 </div>
 
                  <PersonForm person={this.props.person}></PersonForm> 
