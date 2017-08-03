@@ -27,9 +27,25 @@ export default class Index extends Component {
     render() {
         return (
             <Page>
+
+                <style jsx>
+                    {`
+                        .margin-bottom {
+                            margin-bottom: 10px;
+                        }
+                    `}
+                </style>
+
                 <div className="page-header">
-                    <h4>Sobreviventes</h4>
+                    <h4>
+                        Sobreviventes
+                    </h4>
                 </div>
+
+                <Link href={`/person`}>
+                    <button className="btn btn-primary margin-bottom">Novo sobrevivente</button>
+                </Link>
+
                 <table className="table table-striped">
                     <thead>
                         <tr>

@@ -33,6 +33,10 @@ var Page = function Page(props) {
       fileName: _jsxFileName,
       lineNumber: 9
     }
+  }), _react2.default.createElement("link", { rel: "stylesheet", href: "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css", __source: {
+      fileName: _jsxFileName,
+      lineNumber: 10
+    }
   }), props.children);
 };
 

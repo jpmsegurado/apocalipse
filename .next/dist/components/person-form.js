@@ -78,6 +78,8 @@ var PersonForm = function (_Component) {
             person: props.person
         };
 
+        console.log(props.person);
+
         _this.handleInputChange = _this.handleInputChange.bind(_this);
         _this.handleSubmit = _this.handleSubmit.bind(_this);
         return _this;
@@ -89,6 +91,10 @@ var PersonForm = function (_Component) {
             var target = event.target;
             var value = target.type === 'checkbox' ? target.checked : target.value;
             var name = target.name;
+
+            if (name === 'infected') value = value == 'true';
+            if (name === 'age') value = parseInt(value);
+
             var person = (0, _assign2.default)({}, this.state.person, (0, _defineProperty3.default)({}, name, value));
 
             this.setState({
@@ -98,8 +104,28 @@ var PersonForm = function (_Component) {
     }, {
         key: 'handleSubmit',
         value: function handleSubmit(event) {
-            console.log(this.state.person);
+            var _this2 = this;
+
             event.preventDefault();
+            this.setState({ loading: true });
+
+            if (this.state.person.id) {
+                return _axios2.default.patch(_values2.default.baseUrl + 'api/people/' + this.props.person.id + '.json', this.state.person).then(function () {
+                    _this2.setState({ loading: false, success: true });
+                    window.location.href = '/';
+                }, function (err) {
+                    _this2.setState({ loading: false, error: true });
+                });
+            } else {
+                return _axios2.default.post(_values2.default.baseUrl + 'api/people.json', (0, _assign2.default)({}, this.state.person, {
+                    items: ''
+                })).then(function () {
+                    _this2.setState({ loading: false, success: true });
+                    window.location.href = '/';
+                }, function (err) {
+                    _this2.setState({ loading: false, error: true });
+                });
+            }
         }
     }, {
         key: 'render',
@@ -107,173 +133,188 @@ var PersonForm = function (_Component) {
 
             var Span = _styledComponents2.default.span(_templateObject);
 
-            return _react2.default.createElement('form', { className: 'row', onSubmit: this.handleSubmit, 'data-jsx': 2509026133,
+            return _react2.default.createElement('form', { className: 'row', onSubmit: this.handleSubmit, 'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 49
+                    lineNumber: 74
                 }
             }, _react2.default.createElement(_style2.default, {
-                styleId: 2509026133,
-                css: 'input[type="radio"][data-jsx="2509026133"]{margin:0 5px 0 0}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImNvbXBvbmVudHMvcGVyc29uLWZvcm0uanMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBa0Q0QixBQUcwQyxpQkFDckIiLCJmaWxlIjoiY29tcG9uZW50cy9wZXJzb24tZm9ybS5qcyIsInNvdXJjZVJvb3QiOiIvaG9tZS9qb2FvcGVkcm8vRG9jdW1lbnRvcy9Qcm9qZXRvc1JlYWN0L2Fwb2NhbGlwc2UiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgdmFsdWVzIGZyb20gJy4uL3ZhbHVlcyc7XG5pbXBvcnQgUmVhY3QsIHsgQ29tcG9uZW50IH0gZnJvbSAncmVhY3QnO1xuaW1wb3J0IGF4aW9zIGZyb20gJ2F4aW9zJztcbmltcG9ydCBMaW5rIGZyb20gJ25leHQvbGluayc7XG5pbXBvcnQgc3R5bGVkIGZyb20gJ3N0eWxlZC1jb21wb25lbnRzJztcblxuXG5leHBvcnQgZGVmYXVsdCBjbGFzcyBQZXJzb25Gb3JtIGV4dGVuZHMgQ29tcG9uZW50IHtcblxuICAgIGNvbnN0cnVjdG9yKHByb3BzKSB7XG4gICAgICAgIHN1cGVyKHByb3BzKTtcbiAgICAgICAgdGhpcy5zdGF0ZSA9IHtcbiAgICAgICAgICAgIHBlcnNvbjogcHJvcHMucGVyc29uXG4gICAgICAgIH07XG5cbiAgICAgICAgdGhpcy5oYW5kbGVJbnB1dENoYW5nZSA9IHRoaXMuaGFuZGxlSW5wdXRDaGFuZ2UuYmluZCh0aGlzKTtcbiAgICAgICAgdGhpcy5oYW5kbGVTdWJtaXQgPSB0aGlzLmhhbmRsZVN1Ym1pdC5iaW5kKHRoaXMpO1xuICAgIH1cblxuICAgIGhhbmRsZUlucHV0Q2hhbmdlKGV2ZW50KSB7XG4gICAgICAgIGNvbnN0IHRhcmdldCA9IGV2ZW50LnRhcmdldDtcbiAgICAgICAgY29uc3QgdmFsdWUgPSB0YXJnZXQudHlwZSA9PT0gJ2NoZWNrYm94JyA/IHRhcmdldC5jaGVja2VkIDogdGFyZ2V0LnZhbHVlO1xuICAgICAgICBjb25zdCBuYW1lID0gdGFyZ2V0Lm5hbWU7XG4gICAgICAgIGNvbnN0IHBlcnNvbiA9IE9iamVjdC5hc3NpZ24oe30sIHRoaXMuc3RhdGUucGVyc29uLCB7IFtuYW1lXTogdmFsdWUgfSk7XG5cbiAgICAgICAgdGhpcy5zZXRTdGF0ZSh7XG4gICAgICAgICAgICBwZXJzb25cbiAgICAgICAgfSk7IFxuXG4gICAgfVxuXG4gICAgaGFuZGxlU3VibWl0KGV2ZW50KSB7XG4gICAgICAgIGNvbnNvbGUubG9nKHRoaXMuc3RhdGUucGVyc29uKTtcbiAgICAgICAgZXZlbnQucHJldmVudERlZmF1bHQoKTtcbiAgICB9XG5cblxuICAgIHJlbmRlcigpIHtcblxuICAgICAgICBjb25zdCBTcGFuID0gc3R5bGVkLnNwYW5gXG4gICAgICAgICAgICBoZWlnaHQ6IDIwcHg7XG4gICAgICAgICAgICBkaXNwbGF5OiBmbGV4O1xuICAgICAgICAgICAgYWxpZ24taXRlbXM6IGNlbnRlcjtcbiAgICAgICAgICAgIHdpZHRoOiAxMDAlO1xuICAgICAgICBgO1xuXG4gICAgICAgIHJldHVybiAoXG5cbiAgICAgICAgICAgIDxmb3JtIGNsYXNzTmFtZT1cInJvd1wiIG9uU3VibWl0PXt0aGlzLmhhbmRsZVN1Ym1pdH0+XG5cbiAgICAgICAgICAgICAgICA8c3R5bGUganN4PntgXG4gICAgICAgICAgICAgICAgICAgIGlucHV0W3R5cGU9XCJyYWRpb1wiXSB7XG4gICAgICAgICAgICAgICAgICAgICAgICBtYXJnaW46IDAgNXB4IDAgMDtcbiAgICAgICAgICAgICAgICAgICAgfVxuICAgICAgICAgICAgICAgIGB9PC9zdHlsZT5cblxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29sLXhzLTNcIj5cbiAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmb3JtLWdyb3VwXCI+XG4gICAgICAgICAgICAgICAgICAgICAgICA8bGFiZWw+Tm9tZTwvbGFiZWw+XG4gICAgICAgICAgICAgICAgICAgICAgICA8aW5wdXQgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgdHlwZT1cInRleHRcIiBjbGFzc05hbWU9XCJmb3JtLWNvbnRyb2xcIiBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBvbkNoYW5nZT17dGhpcy5oYW5kbGVJbnB1dENoYW5nZX0gXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgbmFtZT1cIm5hbWVcIlxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHZhbHVlPXt0aGlzLnN0YXRlLnBlcnNvbi5uYW1lfS8+XG4gICAgICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2wteHMtM1wiPlxuICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZvcm0tZ3JvdXBcIj5cbiAgICAgICAgICAgICAgICAgICAgICAgIDxsYWJlbD5JZGFkZTwvbGFiZWw+XG4gICAgICAgICAgICAgICAgICAgICAgICA8aW5wdXQgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgdHlwZT1cIm51bWJlclwiIGNsYXNzTmFtZT1cImZvcm0tY29udHJvbFwiIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXt0aGlzLmhhbmRsZUlucHV0Q2hhbmdlfSBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBuYW1lPVwiYWdlXCJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICB2YWx1ZT17dGhpcy5zdGF0ZS5wZXJzb24uYWdlfS8+XG4gICAgICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2wteHMtM1wiPlxuICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZvcm0tZ3JvdXBcIj5cbiAgICAgICAgICAgICAgICAgICAgICAgIDxsYWJlbD5JbmZlY3RhZG8/PC9sYWJlbD5cbiAgICAgICAgICAgICAgICAgICAgICAgIDxTcGFuPlxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8aW5wdXQgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0eXBlPVwicmFkaW9cIiBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXt0aGlzLmhhbmRsZUlucHV0Q2hhbmdlfSBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIG5hbWU9XCJpbmZlY3RlZFwiXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2YWx1ZT1cInRydWVcIlxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY2hlY2tlZD17dGhpcy5zdGF0ZS5wZXJzb24uaW5mZWN0ZWR9Lz5cblxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBTaW1cbiAgICAgICAgICAgICAgICAgICAgICAgIDwvU3Bhbj5cblxuICAgICAgICAgICAgICAgICAgICAgICAgPFNwYW4+XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxpbnB1dCBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHR5cGU9XCJyYWRpb1wiIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9e3RoaXMuaGFuZGxlSW5wdXRDaGFuZ2V9IFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbmFtZT1cImluZmVjdGVkXCJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHZhbHVlPVwiZmFsc2VcIlxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY2hlY2tlZD17IXRoaXMuc3RhdGUucGVyc29uLmluZmVjdGVkfS8+XG5cbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgTsOjb1xuICAgICAgICAgICAgICAgICAgICAgICAgPC9TcGFuPlxuICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29sLXhzLTNcIj5cbiAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmb3JtLWdyb3VwXCI+XG4gICAgICAgICAgICAgICAgICAgICAgICA8bGFiZWw+R8OqbmVybzwvbGFiZWw+PGJyIC8+XG4gICAgICAgICAgICAgICAgICAgICAgICA8U3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPGlucHV0IFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdHlwZT1cInJhZGlvXCIgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBvbkNoYW5nZT17dGhpcy5oYW5kbGVJbnB1dENoYW5nZX0gXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBuYW1lPVwiZ2VuZGVyXCJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHZhbHVlPVwiTVwiXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjaGVja2VkPXt0aGlzLnN0YXRlLnBlcnNvbi5nZW5kZXIgPT09ICdNJ30vPlxuXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE1hc2N1bGlub1xuICAgICAgICAgICAgICAgICAgICAgICAgPC9TcGFuPlxuXG4gICAgICAgICAgICAgICAgICAgICAgICA8U3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPGlucHV0IFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdHlwZT1cInJhZGlvXCIgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBvbkNoYW5nZT17dGhpcy5oYW5kbGVJbnB1dENoYW5nZX0gXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBuYW1lPVwiZ2VuZGVyXCJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHZhbHVlPVwiRlwiXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjaGVja2VkPXt0aGlzLnN0YXRlLnBlcnNvbi5nZW5kZXIgPT09ICdGJ30vPlxuXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEZlbWluaW5vXG4gICAgICAgICAgICAgICAgICAgICAgICA8L1NwYW4+XG4gICAgICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2wteHMtMTJcIj5cbiAgICAgICAgICAgICAgICAgICAgPGJ1dHRvbiBjbGFzc05hbWU9XCJidG4gYnRuLXByaW1hcnkgYnRuLWJsb2NrXCI+U2FsdmFyPC9idXR0b24+XG4gICAgICAgICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICAgIDwvZm9ybT5cbiAgICAgICAgKTtcbiAgICB9XG59Il19 */\n/*@ sourceURL=components/person-form.js */'
-            }), _react2.default.createElement('div', { className: 'col-xs-3', 'data-jsx': 2509026133,
+                styleId: 1514693554,
+                css: 'input[type="radio"][data-jsx="1514693554"]{margin:0 5px 0 0}.fa[data-jsx="1514693554"]{margin-left:5px}.alert[data-jsx="1514693554"]{margin-top:10px}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImNvbXBvbmVudHMvcGVyc29uLWZvcm0uanMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBMkU0QixBQUcwQyxBQUlELEFBSUEsZ0JBSHBCLEFBSUEsQ0FSQSIsImZpbGUiOiJjb21wb25lbnRzL3BlcnNvbi1mb3JtLmpzIiwic291cmNlUm9vdCI6Ii9ob21lL2pvYW9wZWRyby9Eb2N1bWVudG9zL1Byb2pldG9zUmVhY3QvYXBvY2FsaXBzZSIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB2YWx1ZXMgZnJvbSAnLi4vdmFsdWVzJztcbmltcG9ydCBSZWFjdCwgeyBDb21wb25lbnQgfSBmcm9tICdyZWFjdCc7XG5pbXBvcnQgYXhpb3MgZnJvbSAnYXhpb3MnO1xuaW1wb3J0IExpbmsgZnJvbSAnbmV4dC9saW5rJztcbmltcG9ydCBzdHlsZWQgZnJvbSAnc3R5bGVkLWNvbXBvbmVudHMnO1xuXG5cbmV4cG9ydCBkZWZhdWx0IGNsYXNzIFBlcnNvbkZvcm0gZXh0ZW5kcyBDb21wb25lbnQge1xuXG4gICAgY29uc3RydWN0b3IocHJvcHMpIHtcbiAgICAgICAgc3VwZXIocHJvcHMpO1xuICAgICAgICB0aGlzLnN0YXRlID0ge1xuICAgICAgICAgICAgcGVyc29uOiBwcm9wcy5wZXJzb25cbiAgICAgICAgfTtcblxuICAgICAgICBjb25zb2xlLmxvZyhwcm9wcy5wZXJzb24pO1xuXG4gICAgICAgIHRoaXMuaGFuZGxlSW5wdXRDaGFuZ2UgPSB0aGlzLmhhbmRsZUlucHV0Q2hhbmdlLmJpbmQodGhpcyk7XG4gICAgICAgIHRoaXMuaGFuZGxlU3VibWl0ID0gdGhpcy5oYW5kbGVTdWJtaXQuYmluZCh0aGlzKTtcbiAgICB9XG5cbiAgICBoYW5kbGVJbnB1dENoYW5nZShldmVudCkge1xuICAgICAgICBjb25zdCB0YXJnZXQgPSBldmVudC50YXJnZXQ7XG4gICAgICAgIGxldCB2YWx1ZSA9IHRhcmdldC50eXBlID09PSAnY2hlY2tib3gnID8gdGFyZ2V0LmNoZWNrZWQgOiB0YXJnZXQudmFsdWU7XG4gICAgICAgIGNvbnN0IG5hbWUgPSB0YXJnZXQubmFtZTtcbiAgICAgICAgXG4gICAgICAgIGlmKG5hbWUgPT09ICdpbmZlY3RlZCcpIHZhbHVlID0gKHZhbHVlID09ICd0cnVlJyk7XG4gICAgICAgIGlmKG5hbWUgPT09ICdhZ2UnKSB2YWx1ZSA9IHBhcnNlSW50KHZhbHVlKTtcblxuICAgICAgICBjb25zdCBwZXJzb24gPSBPYmplY3QuYXNzaWduKHt9LCB0aGlzLnN0YXRlLnBlcnNvbiwgeyBbbmFtZV06IHZhbHVlIH0pO1xuXG4gICAgICAgIHRoaXMuc2V0U3RhdGUoe1xuICAgICAgICAgICAgcGVyc29uXG4gICAgICAgIH0pOyBcblxuICAgIH1cblxuICAgIGhhbmRsZVN1Ym1pdChldmVudCkge1xuICAgICAgICBldmVudC5wcmV2ZW50RGVmYXVsdCgpO1xuICAgICAgICB0aGlzLnNldFN0YXRlKHsgbG9hZGluZzogdHJ1ZSB9KTtcbiAgICAgICAgXG4gICAgICAgIGlmKHRoaXMuc3RhdGUucGVyc29uLmlkKSB7XG4gICAgICAgICAgICByZXR1cm4gYXhpb3MucGF0Y2goYCR7dmFsdWVzLmJhc2VVcmx9YXBpL3Blb3BsZS8ke3RoaXMucHJvcHMucGVyc29uLmlkfS5qc29uYCwgdGhpcy5zdGF0ZS5wZXJzb24pLnRoZW4oKCkgPT4ge1xuICAgICAgICAgICAgICAgIHRoaXMuc2V0U3RhdGUoeyBsb2FkaW5nOiBmYWxzZSwgc3VjY2VzczogdHJ1ZSB9KTtcbiAgICAgICAgICAgICAgICB3aW5kb3cubG9jYXRpb24uaHJlZiA9ICcvJztcbiAgICAgICAgICAgIH0sIChlcnIpID0+IHtcbiAgICAgICAgICAgICAgICB0aGlzLnNldFN0YXRlKHsgbG9hZGluZzogZmFsc2UsIGVycm9yOiB0cnVlIH0pO1xuICAgICAgICAgICAgfSk7XG4gICAgICAgIH0gZWxzZSB7XG4gICAgICAgICAgICByZXR1cm4gYXhpb3MucG9zdChgJHt2YWx1ZXMuYmFzZVVybH1hcGkvcGVvcGxlLmpzb25gLCBPYmplY3QuYXNzaWduKHt9LCB0aGlzLnN0YXRlLnBlcnNvbiwge1xuICAgICAgICAgICAgICAgIGl0ZW1zOiAnJ1xuICAgICAgICAgICAgfSkpLnRoZW4oKCkgPT4ge1xuICAgICAgICAgICAgICAgIHRoaXMuc2V0U3RhdGUoeyBsb2FkaW5nOiBmYWxzZSwgc3VjY2VzczogdHJ1ZSB9KTtcbiAgICAgICAgICAgICAgICB3aW5kb3cubG9jYXRpb24uaHJlZiA9ICcvJztcbiAgICAgICAgICAgIH0sIChlcnIpID0+IHtcbiAgICAgICAgICAgICAgICB0aGlzLnNldFN0YXRlKHsgbG9hZGluZzogZmFsc2UsIGVycm9yOiB0cnVlIH0pO1xuICAgICAgICAgICAgfSk7XG4gICAgICAgIH1cblxuICAgIH1cblxuXG4gICAgcmVuZGVyKCkge1xuXG4gICAgICAgIGNvbnN0IFNwYW4gPSBzdHlsZWQuc3BhbmBcbiAgICAgICAgICAgIGhlaWdodDogMjBweDtcbiAgICAgICAgICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgICAgICAgICBhbGlnbi1pdGVtczogY2VudGVyO1xuICAgICAgICAgICAgd2lkdGg6IDEwMCU7XG4gICAgICAgIGA7XG5cbiAgICAgICAgcmV0dXJuIChcblxuICAgICAgICAgICAgPGZvcm0gY2xhc3NOYW1lPVwicm93XCIgb25TdWJtaXQ9e3RoaXMuaGFuZGxlU3VibWl0fT5cblxuICAgICAgICAgICAgICAgIDxzdHlsZSBqc3g+e2BcbiAgICAgICAgICAgICAgICAgICAgaW5wdXRbdHlwZT1cInJhZGlvXCJdIHtcbiAgICAgICAgICAgICAgICAgICAgICAgIG1hcmdpbjogMCA1cHggMCAwO1xuICAgICAgICAgICAgICAgICAgICB9XG5cbiAgICAgICAgICAgICAgICAgICAgLmZhIHtcbiAgICAgICAgICAgICAgICAgICAgICAgIG1hcmdpbi1sZWZ0OiA1cHg7XG4gICAgICAgICAgICAgICAgICAgIH1cblxuICAgICAgICAgICAgICAgICAgICAuYWxlcnQge1xuICAgICAgICAgICAgICAgICAgICAgICAgbWFyZ2luLXRvcDogMTBweDtcbiAgICAgICAgICAgICAgICAgICAgfVxuXG4gICAgICAgICAgICAgICAgYH08L3N0eWxlPlxuXG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2wteHMtM1wiPlxuICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZvcm0tZ3JvdXBcIj5cbiAgICAgICAgICAgICAgICAgICAgICAgIDxsYWJlbD5Ob21lPC9sYWJlbD5cbiAgICAgICAgICAgICAgICAgICAgICAgIDxpbnB1dCBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0eXBlPVwidGV4dFwiIGNsYXNzTmFtZT1cImZvcm0tY29udHJvbFwiIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXt0aGlzLmhhbmRsZUlucHV0Q2hhbmdlfSBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBuYW1lPVwibmFtZVwiXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgdmFsdWU9e3RoaXMuc3RhdGUucGVyc29uLm5hbWV9Lz5cbiAgICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvbC14cy0zXCI+XG4gICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZm9ybS1ncm91cFwiPlxuICAgICAgICAgICAgICAgICAgICAgICAgPGxhYmVsPklkYWRlPC9sYWJlbD5cbiAgICAgICAgICAgICAgICAgICAgICAgIDxpbnB1dCBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0eXBlPVwibnVtYmVyXCIgY2xhc3NOYW1lPVwiZm9ybS1jb250cm9sXCIgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9e3RoaXMuaGFuZGxlSW5wdXRDaGFuZ2V9IFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIG5hbWU9XCJhZ2VcIlxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHZhbHVlPXt0aGlzLnN0YXRlLnBlcnNvbi5hZ2V9Lz5cbiAgICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvbC14cy0zXCI+XG4gICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZm9ybS1ncm91cFwiPlxuICAgICAgICAgICAgICAgICAgICAgICAgPGxhYmVsPkluZmVjdGFkbz88L2xhYmVsPlxuICAgICAgICAgICAgICAgICAgICAgICAgPFNwYW4+XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxpbnB1dCBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHR5cGU9XCJyYWRpb1wiIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9e3RoaXMuaGFuZGxlSW5wdXRDaGFuZ2V9IFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbmFtZT1cImluZmVjdGVkXCJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHZhbHVlPXt0cnVlfVxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY2hlY2tlZD17dGhpcy5zdGF0ZS5wZXJzb24uaW5mZWN0ZWR9Lz5cblxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBTaW1cbiAgICAgICAgICAgICAgICAgICAgICAgIDwvU3Bhbj5cblxuICAgICAgICAgICAgICAgICAgICAgICAgPFNwYW4+XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxpbnB1dCBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHR5cGU9XCJyYWRpb1wiIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9e3RoaXMuaGFuZGxlSW5wdXRDaGFuZ2V9IFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbmFtZT1cImluZmVjdGVkXCJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHZhbHVlPXtmYWxzZX1cbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNoZWNrZWQ9eyF0aGlzLnN0YXRlLnBlcnNvbi5pbmZlY3RlZH0vPlxuXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE7Do29cbiAgICAgICAgICAgICAgICAgICAgICAgIDwvU3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvbC14cy0zXCI+XG4gICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZm9ybS1ncm91cFwiPlxuICAgICAgICAgICAgICAgICAgICAgICAgPGxhYmVsPkfDqm5lcm88L2xhYmVsPjxiciAvPlxuICAgICAgICAgICAgICAgICAgICAgICAgPFNwYW4+XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxpbnB1dCBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHR5cGU9XCJyYWRpb1wiIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9e3RoaXMuaGFuZGxlSW5wdXRDaGFuZ2V9IFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbmFtZT1cImdlbmRlclwiXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2YWx1ZT1cIk1cIlxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY2hlY2tlZD17dGhpcy5zdGF0ZS5wZXJzb24uZ2VuZGVyID09PSAnTSd9Lz5cblxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBNYXNjdWxpbm9cbiAgICAgICAgICAgICAgICAgICAgICAgIDwvU3Bhbj5cblxuICAgICAgICAgICAgICAgICAgICAgICAgPFNwYW4+XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxpbnB1dCBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHR5cGU9XCJyYWRpb1wiIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9e3RoaXMuaGFuZGxlSW5wdXRDaGFuZ2V9IFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbmFtZT1cImdlbmRlclwiXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2YWx1ZT1cIkZcIlxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY2hlY2tlZD17dGhpcy5zdGF0ZS5wZXJzb24uZ2VuZGVyID09PSAnRid9Lz5cblxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBGZW1pbmlub1xuICAgICAgICAgICAgICAgICAgICAgICAgPC9TcGFuPlxuICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29sLXhzLTEyXCI+XG4gICAgICAgICAgICAgICAgICAgIDxidXR0b24gY2xhc3NOYW1lPVwiYnRuIGJ0bi1wcmltYXJ5IGJ0bi1ibG9ja1wiIGRpc2FibGVkPXt0aGlzLnN0YXRlLmxvYWRpbmd9PlxuICAgICAgICAgICAgICAgICAgICAgICAgU2FsdmFyXG5cbiAgICAgICAgICAgICAgICAgICAgICAgIHt0aGlzLnN0YXRlLmxvYWRpbmcgJiYgKFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxpIGNsYXNzTmFtZT1cImZhIGZhLXNwaW5uZXIgZmEtc3BpblwiPjwvaT5cbiAgICAgICAgICAgICAgICAgICAgICAgICl9XG4gICAgICAgICAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgICAgICAgICAgPC9idXR0b24+XG5cblxuXG4gICAgICAgICAgICAgICAgICAgIHt0aGlzLnN0YXRlLmVycm9yICYmICF0aGlzLnN0YXRlLmxvYWRpbmcgJiYgKFxuXG4gICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImFsZXJ0IGFsZXJ0LWRhbmdlclwiIHJvbGU9XCJhbGVydFwiPlxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIE7Do28gZm9pIHBvc3PDrXZlbCBzYWx2YXIgZXN0ZSBzb2JyZXZpdmVudGUgbm8gbW9tZW50bywgdGVudGUgbm92YW1lbnRlIG1haXMgdGFyZGUuXG4gICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICAgICAgKX1cblxuICAgICAgICAgICAgICAgICAgICB7dGhpcy5zdGF0ZS5zdWNjZXNzICYmICF0aGlzLnN0YXRlLmxvYWRpbmcgJiYgKFxuICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJhbGVydCBhbGVydC1zdWNjZXNzXCIgcm9sZT1cImFsZXJ0XCI+XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgU29icmV2aXZlbnRlIHNhbHZvIGNvbSBzdWNlc3NvLlxuICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgICAgICl9XG5cblxuICAgICAgICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgICA8L2Zvcm0+XG4gICAgICAgICk7XG4gICAgfVxufSJdfQ== */\n/*@ sourceURL=components/person-form.js */'
+            }), _react2.default.createElement('div', { className: 'col-xs-3', 'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 57
+                    lineNumber: 91
                 }
-            }, _react2.default.createElement('div', { className: 'form-group', 'data-jsx': 2509026133,
+            }, _react2.default.createElement('div', { className: 'form-group', 'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 58
+                    lineNumber: 92
                 }
             }, _react2.default.createElement('label', {
-                'data-jsx': 2509026133,
+                'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 59
+                    lineNumber: 93
                 }
             }, 'Nome'), _react2.default.createElement('input', {
                 type: 'text', className: 'form-control',
                 onChange: this.handleInputChange,
                 name: 'name',
-                value: this.state.person.name, 'data-jsx': 2509026133,
+                value: this.state.person.name, 'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 60
+                    lineNumber: 94
                 }
-            }))), _react2.default.createElement('div', { className: 'col-xs-3', 'data-jsx': 2509026133,
+            }))), _react2.default.createElement('div', { className: 'col-xs-3', 'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 68
+                    lineNumber: 102
                 }
-            }, _react2.default.createElement('div', { className: 'form-group', 'data-jsx': 2509026133,
+            }, _react2.default.createElement('div', { className: 'form-group', 'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 69
+                    lineNumber: 103
                 }
             }, _react2.default.createElement('label', {
-                'data-jsx': 2509026133,
+                'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 70
+                    lineNumber: 104
                 }
             }, 'Idade'), _react2.default.createElement('input', {
                 type: 'number', className: 'form-control',
                 onChange: this.handleInputChange,
                 name: 'age',
-                value: this.state.person.age, 'data-jsx': 2509026133,
+                value: this.state.person.age, 'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 71
+                    lineNumber: 105
                 }
-            }))), _react2.default.createElement('div', { className: 'col-xs-3', 'data-jsx': 2509026133,
+            }))), _react2.default.createElement('div', { className: 'col-xs-3', 'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 79
+                    lineNumber: 113
                 }
-            }, _react2.default.createElement('div', { className: 'form-group', 'data-jsx': 2509026133,
+            }, _react2.default.createElement('div', { className: 'form-group', 'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 80
+                    lineNumber: 114
                 }
             }, _react2.default.createElement('label', {
-                'data-jsx': 2509026133,
+                'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 81
+                    lineNumber: 115
                 }
             }, 'Infectado?'), _react2.default.createElement(Span, {
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 82
+                    lineNumber: 116
                 }
             }, _react2.default.createElement('input', {
                 type: 'radio',
                 onChange: this.handleInputChange,
                 name: 'infected',
-                value: 'true',
-                checked: this.state.person.infected, 'data-jsx': 2509026133,
+                value: true,
+                checked: this.state.person.infected, 'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 83
+                    lineNumber: 117
                 }
             }), 'Sim'), _react2.default.createElement(Span, {
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 93
+                    lineNumber: 127
                 }
             }, _react2.default.createElement('input', {
                 type: 'radio',
                 onChange: this.handleInputChange,
                 name: 'infected',
-                value: 'false',
-                checked: !this.state.person.infected, 'data-jsx': 2509026133,
+                value: false,
+                checked: !this.state.person.infected, 'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 94
+                    lineNumber: 128
                 }
-            }), 'N\xE3o'))), _react2.default.createElement('div', { className: 'col-xs-3', 'data-jsx': 2509026133,
+            }), 'N\xE3o'))), _react2.default.createElement('div', { className: 'col-xs-3', 'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 106
+                    lineNumber: 140
                 }
-            }, _react2.default.createElement('div', { className: 'form-group', 'data-jsx': 2509026133,
+            }, _react2.default.createElement('div', { className: 'form-group', 'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 107
+                    lineNumber: 141
                 }
             }, _react2.default.createElement('label', {
-                'data-jsx': 2509026133,
+                'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 108
+                    lineNumber: 142
                 }
             }, 'G\xEAnero'), _react2.default.createElement('br', {
-                'data-jsx': 2509026133,
+                'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 108
+                    lineNumber: 142
                 }
             }), _react2.default.createElement(Span, {
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 109
+                    lineNumber: 143
                 }
             }, _react2.default.createElement('input', {
                 type: 'radio',
                 onChange: this.handleInputChange,
                 name: 'gender',
                 value: 'M',
-                checked: this.state.person.gender === 'M', 'data-jsx': 2509026133,
+                checked: this.state.person.gender === 'M', 'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 110
+                    lineNumber: 144
                 }
             }), 'Masculino'), _react2.default.createElement(Span, {
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 120
+                    lineNumber: 154
                 }
             }, _react2.default.createElement('input', {
                 type: 'radio',
                 onChange: this.handleInputChange,
                 name: 'gender',
                 value: 'F',
-                checked: this.state.person.gender === 'F', 'data-jsx': 2509026133,
+                checked: this.state.person.gender === 'F', 'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 121
+                    lineNumber: 155
                 }
-            }), 'Feminino'))), _react2.default.createElement('div', { className: 'col-xs-12', 'data-jsx': 2509026133,
+            }), 'Feminino'))), _react2.default.createElement('div', { className: 'col-xs-12', 'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 133
+                    lineNumber: 167
                 }
-            }, _react2.default.createElement('button', { className: 'btn btn-primary btn-block', 'data-jsx': 2509026133,
+            }, _react2.default.createElement('button', { className: 'btn btn-primary btn-block', disabled: this.state.loading, 'data-jsx': 1514693554,
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 134
+                    lineNumber: 168
                 }
-            }, 'Salvar')));
+            }, 'Salvar', this.state.loading && _react2.default.createElement('i', { className: 'fa fa-spinner fa-spin', 'data-jsx': 1514693554,
+                __source: {
+                    fileName: _jsxFileName,
+                    lineNumber: 172
+                }
+            })), this.state.error && !this.state.loading && _react2.default.createElement('div', { className: 'alert alert-danger', role: 'alert', 'data-jsx': 1514693554,
+                __source: {
+                    fileName: _jsxFileName,
+                    lineNumber: 181
+                }
+            }, 'N\xE3o foi poss\xEDvel salvar este sobrevivente no momento, tente novamente mais tarde.'), this.state.success && !this.state.loading && _react2.default.createElement('div', { className: 'alert alert-success', role: 'alert', 'data-jsx': 1514693554,
+                __source: {
+                    fileName: _jsxFileName,
+                    lineNumber: 187
+                }
+            }, 'Sobrevivente salvo com sucesso.')));
         }
     }]);
 

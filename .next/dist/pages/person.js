@@ -88,20 +88,20 @@ var Person = function (_Component) {
             return _react2.default.createElement(_page2.default, {
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 41
+                    lineNumber: 45
                 }
             }, _react2.default.createElement('div', { className: 'page-header', __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 42
+                    lineNumber: 46
                 }
             }, _react2.default.createElement('h4', {
                 __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 43
+                    lineNumber: 47
                 }
             }, 'Informa\xE7\xF5es do sobrevivente')), _react2.default.createElement(_personForm2.default, { person: this.props.person, __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 46
+                    lineNumber: 52
                 }
             }));
         }
@@ -113,6 +113,16 @@ var Person = function (_Component) {
                     while (1) {
                         switch (_context.prev = _context.next) {
                             case 0:
+                                if (args.query.id) {
+                                    _context.next = 2;
+                                    break;
+                                }
+
+                                return _context.abrupt('return', {
+                                    person: {}
+                                });
+
+                            case 2:
                                 return _context.abrupt('return', _axios2.default.get(_values2.default.baseUrl + 'api/people/' + args.query.id + '.json').then(function (resp) {
                                     var person = resp.data;
                                     return {
@@ -122,7 +132,7 @@ var Person = function (_Component) {
                                     return;
                                 }));
 
-                            case 1:
+                            case 3:
                             case 'end':
                                 return _context.stop();
                         }
