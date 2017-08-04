@@ -64,7 +64,7 @@ export default class Person extends Component {
                         <h4>
                             Informações do sobrevivente
 
-                            <Link href='/'>
+                            <Link href='/people'>
                                 <button className="btn btn-link pull-right">Voltar para o início</button>
                             </Link>
                         </h4>

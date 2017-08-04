@@ -2,15 +2,43 @@ import values from '../values';
 import React, { Component } from 'react';
 import Page from '../components/page';
 import Link from 'next/link';
-
+import axios from 'axios';
 
 export default class People extends Component {
 
     constructor(props) {
         super(props);
+        this.submit = this.submit.bind(this);
+        this.changedId = this.changedId.bind(this);
+        this.state = {};
     }
 
 
+    submit(event) {
+        event.preventDefault();
+
+        this.setState({ loading: true, error: false});
+
+        return axios.get(`${values.baseUrl}api/people/${this.state.id}.json`).then((res) => {
+            const user = res.data;
+
+            localStorage.setItem('user', JSON.stringify(user));
+            window.location.href = '/people';
+
+            this.setState({ error: false});
+        }, () => {
+            this.setState({ loading: false, error: true});
+        });
+
+    }
+
+    changedId(event) {
+        const value = event.target.value;
+
+        this.setState({
+            id: value
+        });
+    }
 
 
     render() {
@@ -38,6 +66,11 @@ export default class People extends Component {
                             bottom: 0;
                             right: 0;
                             height: 239px;
+                            width: 400px;
+                        }
+
+                        .login .jumbotron {
+                            max-width: 100%;
                         }
 
                     `}
@@ -45,14 +78,33 @@ export default class People extends Component {
 
                 <div className="col-xs-3 col-xs-offset-6 login">
                     <div className="jumbotron">
-                            <div className="container">
+                            <form className="container" onSubmit={this.submit}>
                                     <div className="form-group">
                                     <label>Usuário</label>
-                                    <input className="form-control" type="text" placeholder="Seu ID"/>
+                                    <input 
+                                        name="id" 
+                                        className="form-control" 
+                                        onChange={this.changedId}
+                                        type="text" 
+                                        placeholder="Seu ID"/>
                                 </div>
 
-                                <button className="btn btn-primary btn-block">Entrar</button>
-                            </div>
+                                <button type="submit" className="btn btn-primary btn-block" disabled={this.state.loading}>
+                                    Entrar
+
+                                    {this.state.loading && (
+                                        <i className="fa fa-spinner fa-spin"></i>
+                                    )}
+                                </button>
+
+                                {this.state.error && !this.state.loading && (
+
+                                    <div className="alert alert-danger" role="alert">
+                                        Usuário não encontrado
+                                    </div>
+                                )}
+                            
+                            </form>
                     </div>
                 </div>
             </Page>

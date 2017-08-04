@@ -73,7 +73,7 @@ export default class PersonForm extends Component {
         if(this.state.person.id) {
             return axios.patch(`${values.baseUrl}api/people/${this.props.person.id}.json`, this.state.person).then(() => {
                 this.setState({ loading: false, success: true });
-                window.location.href = '/';
+                window.location.href = '/people';
             }, (err) => {
                 this.setState({ loading: false, error: true });
             });
@@ -127,10 +127,14 @@ export default class PersonForm extends Component {
                         max-width: 100px;
                     }
 
+                    .infected { 
+                        margin: 20px -15px;
+                    }
+
                 `}</style>
 
                 <div className="row">
-                        <div className="col-xs-3">
+                        <div className="col-xs-4">
                         <div className="form-group">
                             <label>Nome</label>
                             <input 
@@ -142,7 +146,7 @@ export default class PersonForm extends Component {
                         </div>
                     </div>
 
-                    <div className="col-xs-3">
+                    <div className="col-xs-4">
                         <div className="form-group">
                             <label>Idade</label>
                             <input
@@ -154,36 +158,7 @@ export default class PersonForm extends Component {
                         </div>
                     </div>
 
-                    <div className="col-xs-3">
-                        <div className="form-group">
-                            <label>Infectado?</label>
-                            <Span>
-                                    <input 
-                                        required
-                                        type="radio" 
-                                        onChange={this.handleInputChange} 
-                                        name="infected"
-                                        value={true}
-                                        checked={this.state.person.infected}/>
-
-                                    Sim
-                            </Span>
-
-                            <Span>
-                                    <input 
-                                        required
-                                        type="radio" 
-                                        onChange={this.handleInputChange} 
-                                        name="infected"
-                                        value={false}
-                                        checked={!this.state.person.infected}/>
-
-                                    Não
-                            </Span>
-                        </div>
-                    </div>
-
-                    <div className="col-xs-3">
+                    <div className="col-xs-4">
                         <div className="form-group">
                             <label>Gênero</label><br />
                             <Span>
@@ -213,6 +188,13 @@ export default class PersonForm extends Component {
                     </div>
                 </div>
 
+                <div className="row infected">
+                    <div className="col-xs-12">
+                        <button className="btn btn-primary btn-block">
+                            Marcar como infectado
+                        </button>
+                    </div>
+                </div>
                 
                 <div className="row">
                     <div className="col-xs-12">

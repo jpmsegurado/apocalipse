@@ -9,8 +9,20 @@ export default class People extends Component {
 
     constructor(props) {
         super(props);
+        this.state = {};
+        this.loadUser = this.loadUser.bind(this);
     }
 
+    loadUser() {
+        let user = localStorage.getItem('user');
+        if(user) user = JSON.parse(user);
+        console.log(user);
+        this.setState({ user });
+    }
+
+    componentDidMount() {
+        this.loadUser();
+    }
 
 
     static async getInitialProps() {
@@ -36,9 +48,18 @@ export default class People extends Component {
                     `}
                 </style>
 
-                <div className="page-header">
+                <div className="page-header" onLoad={this.loadUser}>
                     <h4>
                         Sobreviventes
+                        {   
+                            this.state.user && 
+                            <button className="btn btn-link pull-right">
+                                Bem vindo(a), {this.state.user.name}.
+                            </button>
+                        }
+
+                        <span className="pull-right"></span>
+
                     </h4>
                 </div>
 
