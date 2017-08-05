@@ -14,6 +14,10 @@ app.prepare()
     app.render(req, res, '/person', Object.assign({}, req.query, { id: req.params.id }))
   })
 
+  server.get('/trade/:id', (req, res) => {
+    app.render(req, res, '/trade', Object.assign({}, req.query, { id: req.params.id }))
+  })
+
   server.get('*', (req, res) => {
     return handle(req, res)
   })

@@ -50,16 +50,7 @@ export default class Person extends Component {
 
         return (
             <Page>
-
-                <style jsx>
-                    {`
-                        .margin-bottom {
-                            margin-bottom: 10px;
-                        }
-                    `}
-                </style>
-
-                <div className="col-xs-8 col-xs-offset-2">
+                <div className="col-xs-12">
                     <div className="page-header">
                         <h4>
                             Informações do sobrevivente

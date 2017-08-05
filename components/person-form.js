@@ -4,12 +4,7 @@ import axios from 'axios';
 import Link from 'next/link';
 import styled from 'styled-components';
 
-const aliases = {
-    'water': 'Água',
-    'ammunition': 'Munição',
-    'food': 'Comida',
-    'medication': 'Medicação'
-};
+const aliases = values.aliases;
 
 export default class PersonForm extends Component {
 
@@ -33,6 +28,7 @@ export default class PersonForm extends Component {
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleItemChange = this.handleItemChange.bind(this);
+        this.reportInfection = this.reportInfection.bind(this);
     }
 
     handleInputChange(event) {
@@ -65,6 +61,20 @@ export default class PersonForm extends Component {
         
         this.setState({person});
 
+    }
+
+    reportInfection(event) {
+
+        const user = JSON.parse(localStorage.getItem('user'));
+        const params = {
+            infected: this.state.person.id
+        }
+        this.setState({ reporting: true });
+        return axios.post(`${values.baseUrl}api/people/${user.id}/report_infection.json`, params).then(() => {
+            this.setState({ reporting: false, reported: true });
+        }, () => {
+            this.setState({ reporting: false });
+        });
     }
 
     handleSubmit(event) {
@@ -131,6 +141,11 @@ export default class PersonForm extends Component {
                         margin: 20px -15px;
                     }
 
+                    .btn-link {
+                        margin: 0;
+                        padding: 0;
+                    }
+
                 `}</style>
 
                 <div className="row">
@@ -190,8 +205,13 @@ export default class PersonForm extends Component {
 
                 <div className="row infected">
                     <div className="col-xs-12">
-                        <button className="btn btn-primary btn-block">
-                            Marcar como infectado
+                        <button className="btn btn-primary btn-block" type="button" onClick={this.reportInfection}>
+
+                            {this.state.reported ? 'Você marcou como infectado(a)' : 'Marcar como infectado(a)'}
+
+                            {this.state.reporting && (
+                                <i className="fa fa-spinner fa-spin"></i>
+                            )}
                         </button>
                     </div>
                 </div>
@@ -205,7 +225,21 @@ export default class PersonForm extends Component {
                         }
                         {((this.state.person.id && this.state.person.items.length > 0) || !this.state.person.id) &&
                             <div>
-                                <h4>Inventário</h4>
+
+                                <div className="page-header">
+                                        <h4>
+                                            Inventário
+
+                                            {this.state.person.id &&  
+                                        
+                                            <Link href={`/trade/${this.state.person.id}`}>
+                                                <a type="button" className="btn btn-link pull-right">
+                                                    Fazer troca de itens
+                                                </a>
+                                            </Link>}
+
+                                    </h4>
+                                </div>
                                 <table className="table table-striped">
                                     <thead>
                                         <tr>
@@ -235,6 +269,7 @@ export default class PersonForm extends Component {
                                     </tbody>
 
                                 </table>
+
                             </div>
                         }
                     </div>
