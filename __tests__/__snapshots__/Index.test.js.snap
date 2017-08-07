@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`With Snapshot Testing Label shows "Usuário" 1`] = `
+<div
+  className="sc-bdVaJa hwOTrO"
+>
+  <link
+    href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    rel="stylesheet"
+  />
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAD3yTq68bvCM8xkUSaByG3LETyCQaRzmU"
+  />
+  <div
+    className="col-xs-3 col-xs-offset-6 login"
+    data-jsx={2306171780}
+  >
+    <div
+      className="jumbotron"
+      data-jsx={2306171780}
+    >
+      <form
+        className="container"
+        data-jsx={2306171780}
+        onSubmit={[Function]}
+      >
+        <div
+          className="form-group"
+          data-jsx={2306171780}
+        >
+          <label
+            data-jsx={2306171780}
+          >
+            Usuário
+          </label>
+          <input
+            className="form-control"
+            data-jsx={2306171780}
+            name="id"
+            onChange={[Function]}
+            placeholder="Seu ID"
+            type="text"
+          />
+        </div>
+        <button
+          className="btn btn-primary btn-block"
+          data-jsx={2306171780}
+          disabled={undefined}
+          type="submit"
+        >
+          Entrar
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+`;

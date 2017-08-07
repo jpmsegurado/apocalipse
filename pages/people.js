@@ -11,7 +11,6 @@ export default class People extends Component {
         super(props);
         this.state = {};
         this.loadUser = this.loadUser.bind(this);
-        console.log(props.itens);
     }
 
     loadUser() {
@@ -53,9 +52,11 @@ export default class People extends Component {
                         Sobreviventes
                         {   
                             this.state.user && 
-                            <button className="btn btn-link pull-right">
-                                Bem vindo(a), {this.state.user.name}.
-                            </button>
+                            <Link href={`/person/${this.state.user.id}`}>
+                                    <button className="btn btn-link pull-right">
+                                        Ver meu perfil
+                                    </button>
+                            </Link>
                         }
 
                         <span className="pull-right"></span>

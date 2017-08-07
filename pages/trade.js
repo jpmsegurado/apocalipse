@@ -130,9 +130,6 @@ export default class Trade extends Component {
             }, 1000);
         }, () => {
             this.setState({ error: true, loading: false });
-            // setTimeout(() => {
-            //     window.location.href = `/person/${this.state.person.id}`;
-            // }, 1000);
         });
     }
 

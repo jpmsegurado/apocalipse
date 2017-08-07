@@ -22,7 +22,8 @@ export default class PersonForm extends Component {
         }
 
         this.state = {
-            person: person
+            person: person,
+            user: {}
         };
 
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -31,8 +32,20 @@ export default class PersonForm extends Component {
         this.reportInfection = this.reportInfection.bind(this);
     }
 
-    componentDidMount() {
+    loadUser() {
+        let user = localStorage.getItem('user');
+        if(user) user = JSON.parse(user);
+        this.setState({ user });
+    }
 
+    componentDidMount() {
+        this.loadUser();
+        setTimeout(() => {
+            (!this.state.person.id || this.state.person.id === this.state.user.id) && this.loadMap();
+        }, 1000);
+    }
+
+    loadMap() {
         let points = this.props.person.lonlat;
         let re;
         let lat;
@@ -50,7 +63,7 @@ export default class PersonForm extends Component {
 
         let center = {lat: lat, lng: lng};
         let map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 16,
+          zoom: 10,
           center: center
         });
         let marker = new google.maps.Marker({
@@ -59,14 +72,13 @@ export default class PersonForm extends Component {
           map: map
         });
 
-        map.addListener('drag', () => {
+        map.addListener('center_changed', () => {
             let center = {lat: map.getCenter().lat(), lng: map.getCenter().lng()};
             marker.setPosition(center);
             let newLatLng = `point(${center.lat}, ${center.lng})`;
             const person = Object.assign({}, this.state.person, { lonlat: newLatLng });
             this.setState({ person });
         });
-
     }
 
     handleInputChange(event) {
@@ -318,11 +330,12 @@ export default class PersonForm extends Component {
                 </div>
 
 
+                {( !this.state.person.id || this.state.person.id === this.state.user.id ) && 
                 <div className="row">
                     <div className="col-xs-12">
                         <div id="map"></div>
                     </div>
-                </div>
+                </div>}
 
                 <div className="row margin-top">
                     <div className="col-xs-12">

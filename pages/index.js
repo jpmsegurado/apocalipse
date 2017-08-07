@@ -4,7 +4,7 @@ import Page from '../components/page';
 import Link from 'next/link';
 import axios from 'axios';
 
-export default class People extends Component {
+export default class Index extends Component {
 
     constructor(props) {
         super(props);

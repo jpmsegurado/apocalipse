@@ -18,7 +18,7 @@ var _styledComponents2 = _interopRequireDefault(_styledComponents);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _jsxFileName = '/Users/joaopedro/apps/apocalipse/components/page.js';
+var _jsxFileName = '/home/joaopedro/Documentos/ProjetosReact/apocalipse/components/page.js';
 
 var _templateObject = (0, _taggedTemplateLiteral3.default)(['\n    margin: 0;\n    padding: 0;\n'], ['\n    margin: 0;\n    padding: 0;\n']);
 
