@@ -31,6 +31,44 @@ export default class PersonForm extends Component {
         this.reportInfection = this.reportInfection.bind(this);
     }
 
+    componentDidMount() {
+
+        let points = this.props.person.lonlat;
+        let re;
+        let lat;
+        let lng;
+        if(!!points) {
+
+            re = /\((.*)\)/;
+            lat = parseFloat(points.match(re)[1].split(' ')[0]);
+            lng = parseFloat(points.match(re)[1].split(' ')[1]);
+
+        } else {
+            lat = -19;
+            lng = -45;
+        }
+
+        let center = {lat: lat, lng: lng};
+        let map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 16,
+          center: center
+        });
+        let marker = new google.maps.Marker({
+          position: center,
+          draggable: true,
+          map: map
+        });
+
+        map.addListener('drag', () => {
+            let center = {lat: map.getCenter().lat(), lng: map.getCenter().lng()};
+            marker.setPosition(center);
+            let newLatLng = `point(${center.lat}, ${center.lng})`;
+            const person = Object.assign({}, this.state.person, { lonlat: newLatLng });
+            this.setState({ person });
+        });
+
+    }
+
     handleInputChange(event) {
         const target = event.target;
         let value = target.type === 'checkbox' ? target.checked : target.value;
@@ -83,7 +121,6 @@ export default class PersonForm extends Component {
         if(this.state.person.id) {
             return axios.patch(`${values.baseUrl}api/people/${this.props.person.id}.json`, this.state.person).then(() => {
                 this.setState({ loading: false, success: true });
-                window.location.href = '/people';
             }, (err) => {
                 this.setState({ loading: false, error: true });
             });
@@ -119,6 +156,11 @@ export default class PersonForm extends Component {
                 <style jsx>{`
                     input[type="radio"] {
                         margin: 0 5px 0 0;
+                    }
+
+                    #map {
+                        width: 100%;
+                        height: 400px;
                     }
 
                     .fa {
@@ -230,7 +272,7 @@ export default class PersonForm extends Component {
                                         <h4>
                                             Inventário
 
-                                            {this.state.person.id &&  
+                                            {(this.state.person.id && !this.state.person['infected?']) && 
                                         
                                             <Link href={`/trade/${this.state.person.id}`}>
                                                 <a type="button" className="btn btn-link pull-right">
@@ -275,6 +317,12 @@ export default class PersonForm extends Component {
                     </div>
                 </div>
 
+
+                <div className="row">
+                    <div className="col-xs-12">
+                        <div id="map"></div>
+                    </div>
+                </div>
 
                 <div className="row margin-top">
                     <div className="col-xs-12">

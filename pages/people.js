@@ -11,12 +11,12 @@ export default class People extends Component {
         super(props);
         this.state = {};
         this.loadUser = this.loadUser.bind(this);
+        console.log(props.itens);
     }
 
     loadUser() {
         let user = localStorage.getItem('user');
         if(user) user = JSON.parse(user);
-        console.log(user);
         this.setState({ user });
     }
 
@@ -27,7 +27,7 @@ export default class People extends Component {
 
     static async getInitialProps() {
         return axios.get(`${values.baseUrl}api/people.json`).then((resp) => {
-            const itens = resp.data.splice(0, 10);
+            const itens = resp.data;
             return {
                 itens: itens
             }
@@ -92,7 +92,7 @@ export default class People extends Component {
                                 </td>
                                 <td>{item.age}</td>
                                 <td>{item.gender === 'M' ? 'Masculino' : 'Feminino'}</td>
-                                <td>{item.infected ? 'Sim' : 'Não'}</td>
+                                <td>{item['infected?'] ? 'Sim' : 'Não'}</td>
                             </tr>    
                         )}
                     </tbody>

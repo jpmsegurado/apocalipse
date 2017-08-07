@@ -121,7 +121,7 @@ export default class Trade extends Component {
             'consumer[payment]': userStr
         };
 
-        this.setState({ loading: true });
+        this.setState({ loading: true, error: false, success: false });
 
         return axios.post(`${values.baseUrl}api/people/${this.state.user.id}/properties/trade_item.json`, params).then(() => {
             this.setState({ success: true });
@@ -129,10 +129,10 @@ export default class Trade extends Component {
                 window.location.href = `/person/${this.state.person.id}`;
             }, 1000);
         }, () => {
-            this.setState({ success: true });
-            setTimeout(() => {
-                window.location.href = `/person/${this.state.person.id}`;
-            }, 1000);
+            this.setState({ error: true, loading: false });
+            // setTimeout(() => {
+            //     window.location.href = `/person/${this.state.person.id}`;
+            // }, 1000);
         });
     }
 
@@ -212,7 +212,7 @@ export default class Trade extends Component {
                             
                             <tbody>
                                 {!!this.state.user &&  this.state.user.items.map((item) => (
-                                        <tr>
+                                        <tr key={item.item.name}>
                                             <td>
                                                 <span>
                                                     {aliases[item.item.name.toLowerCase()]}
@@ -253,7 +253,7 @@ export default class Trade extends Component {
                             </thead>
                             <tbody>
                                 {this.state.person.items.map((item) => (
-                                        <tr>
+                                        <tr key={item.item.name}>
                                             <td>
                                                 <span>
                                                     {aliases[item.item.name.toLowerCase()]}
@@ -295,6 +295,13 @@ export default class Trade extends Component {
                     <div className="col-xs-12"> 
                         <div className="alert alert-success">
                             Troca realizada com sucesso.
+                        </div>
+                    </div>}
+
+                    {this.state.error && 
+                    <div className="col-xs-12"> 
+                        <div className="alert alert-danger">
+                            Não foi possível realizar esta troca no momento.
                         </div>
                     </div>}
 

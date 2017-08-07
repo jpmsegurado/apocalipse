@@ -18,7 +18,7 @@ var _styledComponents2 = _interopRequireDefault(_styledComponents);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _jsxFileName = '/home/joaopedro/Documentos/ProjetosReact/apocalipse/components/page.js';
+var _jsxFileName = '/Users/joaopedro/apps/apocalipse/components/page.js';
 
 var _templateObject = (0, _taggedTemplateLiteral3.default)(['\n    margin: 0;\n    padding: 0;\n'], ['\n    margin: 0;\n    padding: 0;\n']);
 
@@ -36,6 +36,10 @@ var Page = function Page(props) {
   }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css', __source: {
       fileName: _jsxFileName,
       lineNumber: 10
+    }
+  }), _react2.default.createElement('script', { src: 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAD3yTq68bvCM8xkUSaByG3LETyCQaRzmU', __source: {
+      fileName: _jsxFileName,
+      lineNumber: 11
     }
   }), props.children);
 };
