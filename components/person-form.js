@@ -73,7 +73,7 @@ export default class PersonForm extends Component {
         return axios.post(`${values.baseUrl}api/people/${user.id}/report_infection.json`, params).then(() => {
             this.setState({ reporting: false, reported: true });
         }, () => {
-            this.setState({ reporting: false });
+            this.setState({ reporting: false, reported: true });
         });
     }
 

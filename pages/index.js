@@ -70,7 +70,7 @@ export default class People extends Component {
                         }
 
                         .login .jumbotron {
-                            max-width: 100%;
+                            width: 100%;
                         }
 
                     `}

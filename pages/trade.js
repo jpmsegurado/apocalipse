@@ -102,7 +102,38 @@ export default class Trade extends Component {
     }
 
     tradeItems() {
-        console.log(this.state);
+
+        let personStr = '';
+        let userStr = '';
+
+        for(let prop in this.state.itemsPerson) {
+            personStr = `${personStr}${prop}:${this.state.itemsPerson[prop]};`;
+        }
+
+
+        for(let prop in this.state.itemsUser) {
+            userStr = `${userStr}${prop}:${this.state.itemsUser[prop]};`;
+        }
+        
+        const params = {
+            'consumer[name]': this.state.person.name,
+            'consumer[pick]': personStr,
+            'consumer[payment]': userStr
+        };
+
+        this.setState({ loading: true });
+
+        return axios.post(`${values.baseUrl}api/people/${this.state.user.id}/properties/trade_item.json`, params).then(() => {
+            this.setState({ success: true });
+            setTimeout(() => {
+                window.location.href = `/person/${this.state.person.id}`;
+            }, 1000);
+        }, () => {
+            this.setState({ success: true });
+            setTimeout(() => {
+                window.location.href = `/person/${this.state.person.id}`;
+            }, 1000);
+        });
     }
 
     render() {
@@ -253,10 +284,19 @@ export default class Trade extends Component {
                     </div>
 
                     <div className="col-xs-12">
-                        <button type="button" onClick={this.tradeItems} className="btn btn-primary btn-block primary" disabled={this.canEnable()}>
+                        <button type="button" onClick={this.tradeItems} className="btn btn-primary btn-block primary" disabled={this.canEnable() || this.state.loading}>
                             Confirmar troca
+                            {this.state.loading && 
+                            <i className="fa fa-spin fa-spinner"></i>}
                         </button>
                     </div>
+
+                    {this.state.success && 
+                    <div className="col-xs-12"> 
+                        <div className="alert alert-success">
+                            Troca realizada com sucesso.
+                        </div>
+                    </div>}
 
                     <div className="col-xs-12">
                         <p className="text-center">
