@@ -133,6 +133,7 @@ export default class PersonForm extends Component {
         if(this.state.person.id) {
             return axios.patch(`${values.baseUrl}api/people/${this.props.person.id}.json`, this.state.person).then(() => {
                 this.setState({ loading: false, success: true });
+                window.location.href = '/people';
             }, (err) => {
                 this.setState({ loading: false, error: true });
             });
@@ -144,6 +145,7 @@ export default class PersonForm extends Component {
 
             return axios.post(`${values.baseUrl}api/people.json`, person).then(() => {
                 this.setState({ loading: false, success: true });
+                window.location.href = '/people';
             }, (err) => {
                 this.setState({ loading: false, error: true });
             });
