@@ -38,8 +38,6 @@ export default class Person extends Component {
 
             });
 
-        }, () => {
-            return;
         })
     }
 

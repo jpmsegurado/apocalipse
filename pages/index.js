@@ -1,8 +1,7 @@
-import values from '../values';
 import React, { Component } from 'react';
-import Page from '../components/page';
-import Link from 'next/link';
 import axios from 'axios';
+import values from '../values';
+import Page from '../components/page';
 
 export default class Index extends Component {
 
@@ -17,35 +16,34 @@ export default class Index extends Component {
     submit(event) {
         event.preventDefault();
 
-        this.setState({ loading: true, error: false});
+        this.setState({ loading: true, error: false });
 
         return axios.get(`${values.baseUrl}api/people/${this.state.id}.json`).then((res) => {
             const user = res.data;
 
-            localStorage.setItem('user', JSON.stringify(user));
+            window.localStorage.setItem('user', JSON.stringify(user));
             window.location.href = '/people';
 
-            this.setState({ error: false});
+            this.setState({ error: false });
         }, () => {
-            this.setState({ loading: false, error: true});
+            this.setState({ loading: false, error: true });
         });
-
     }
 
     changedId(event) {
         const value = event.target.value;
 
         this.setState({
-            id: value
+            id: value,
         });
     }
 
 
     render() {
         return (
-            <Page withoutContainer={true}>
+          <Page withoutContainer>
 
-                <style jsx>
+          <style jsx>
                     {`
                         .login {
                             display: flex;
@@ -107,7 +105,7 @@ export default class Index extends Component {
                             </form>
                     </div>
                 </div>
-            </Page>
+              </Page>
         );
     }
 }
