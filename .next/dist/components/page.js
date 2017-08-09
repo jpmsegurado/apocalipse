@@ -33,13 +33,17 @@ var Page = function Page(props) {
       fileName: _jsxFileName,
       lineNumber: 9
     }
-  }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css', __source: {
+  }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'https://npmcdn.com/react-bootstrap-table/dist/react-bootstrap-table-all.min.css', __source: {
       fileName: _jsxFileName,
       lineNumber: 10
     }
-  }), _react2.default.createElement('script', { src: 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAD3yTq68bvCM8xkUSaByG3LETyCQaRzmU', __source: {
+  }), _react2.default.createElement('link', { rel: 'stylesheet', href: 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css', __source: {
       fileName: _jsxFileName,
       lineNumber: 11
+    }
+  }), _react2.default.createElement('script', { src: 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAD3yTq68bvCM8xkUSaByG3LETyCQaRzmU', __source: {
+      fileName: _jsxFileName,
+      lineNumber: 12
     }
   }), props.children);
 };

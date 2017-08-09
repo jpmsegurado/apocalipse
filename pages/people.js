@@ -3,14 +3,22 @@ import React, { Component } from 'react';
 import Page from '../components/page';
 import axios from 'axios';
 import Link from 'next/link';
+import Router from 'next/router'
+import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 
 
 export default class People extends Component {
 
     constructor(props) {
         super(props);
+        const page = 1;
+        const take = 10;
+        const start = (page - 1) * take;
+        const end = (page * take) - 1;
         this.state = {
-            page: 1
+            start,
+            end,
+            take: take
         };
         this.loadUser = this.loadUser.bind(this);
     }
@@ -28,13 +36,34 @@ export default class People extends Component {
 
     static async getInitialProps() {
         return axios.get(`${values.baseUrl}api/people.json`).then((resp) => {
-            const itens = resp.data;
+            const itens = resp.data.map((person) => {
+                person.status = person['infected?'] ? 'Infectado' : 'não Infectado';
+                person.genderLabel = person.gender === 'M' ? 'Masculino' : 'Feminino';
+                return person;
+            });
+            const headers = [
+                'Nome',
+                'Idade',
+                'Gênero',
+                'Infectado'
+            ];
+
             return {
-                itens: itens
+                headers,
+                itens: itens,
             }
         }, () => {
             return;
         })
+    }
+
+    onRowClick(row) {
+        window.location.href = `/person/${row.location.split('/').pop()}`;
+    }
+
+    setPagination(page) {
+        const start = (page - 1) * this.state.take;
+        const end = (page * this.state.take) - 1;
     }
 
     render() {
@@ -46,6 +75,16 @@ export default class People extends Component {
                         .margin-bottom {
                             margin-bottom: 10px;
                         }
+
+                        .clickable {
+                            cursor: pointer;
+                        }
+                        
+
+                        .my-table {
+                            cursor: pointer;
+                        }
+
                     `}
                 </style>
 
@@ -70,37 +109,19 @@ export default class People extends Component {
                     <button className="btn btn-primary margin-bottom">Novo sobrevivente</button>
                 </Link>
 
-                <table className="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Idade</th>
-                            <th>Gênero</th>
-                            <th>Infectado</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {this.props.itens.map((item) => 
-                            <tr key={item.location.split('/').pop()}>
-                                <td>
-                                    <Link 
-                                        key={item.location.split('/').pop()}
-                                        href={`/person?id=${item.location.split('/').pop()}`}
-                                        as={`/person/${item.location.split('/').pop()}`} >
-
-                                        <a>{item.name}</a>
-
-                                    </Link>
-                                </td>
-                                <td>{item.age}</td>
-                                <td>{item.gender === 'M' ? 'Masculino' : 'Feminino'}</td>
-                                <td>{item['infected?'] ? 'Sim' : 'Não'}</td>
-                            </tr>    
-                        )}
-                    </tbody>
-
-                </table>
+                <div className="my-table">
+                    <BootstrapTable 
+                        trClassName={'clickable'} data={this.props.itens} search striped 
+                        searchPlaceholder='Pesquisar...' hover
+                        pagination options={{ onRowClick: this.onRowClick }}>
+                        <TableHeaderColumn isKey={true} dataField='name'> 
+                            Nome
+                        </TableHeaderColumn>
+                        <TableHeaderColumn dataField='genderLabel'>Gênero</TableHeaderColumn>
+                        <TableHeaderColumn dataField='age'>Idade</TableHeaderColumn>
+                        <TableHeaderColumn dataField='status'>Infectado</TableHeaderColumn>
+                    </BootstrapTable>
+                </div>
 
             </Page>
         );
