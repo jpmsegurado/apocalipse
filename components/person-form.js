@@ -259,7 +259,7 @@ export default class PersonForm extends Component {
                     </div>
                 </div>
 
-               {this.state.person.id && 
+               {(this.state.person.id && this.state.user.id !== this.state.person.id) && 
                 <div className="row infected">
                     <div className="col-xs-12">
                         {<button className="btn btn-primary btn-block" type="button" onClick={this.reportInfection}>
@@ -289,7 +289,7 @@ export default class PersonForm extends Component {
 
                                             {(this.state.person.id && !this.state.person['infected?']) && 
                                         
-                                            <Link href={`/trade/${this.state.person.id}`}>
+                                            <Link href={`/trade?id=${this.state.person.id}`} as={`/trade/${this.state.person.id}`}>
                                                 <a type="button" className="btn btn-link pull-right">
                                                     Fazer troca de itens
                                                 </a>

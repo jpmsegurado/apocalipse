@@ -93,7 +93,7 @@ export default class People extends Component {
                         Sobreviventes
                         {   
                             this.state.user && 
-                            <Link href={`/person/${this.state.user.id}`}>
+                            <Link href={`/person?id=${this.state.user.id}`} as={`/person/${this.state.user.id}`}>
                                     <button className="btn btn-link pull-right">
                                         Ver meu perfil
                                     </button>

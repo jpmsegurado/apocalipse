@@ -190,7 +190,7 @@ export default class Trade extends Component {
                         <h4>
                             Troca com {this.state.person.name}
 
-                            <Link href={`/person/${this.state.person.id}`}>
+                            <Link href={`/person?id=${this.state.person.id}`} as={`/person/${this.state.person.id}`}>
                                 <a className="btn btn-link pull-right">Voltar</a> 
                             </Link>
 
