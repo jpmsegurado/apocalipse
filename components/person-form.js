@@ -257,18 +257,19 @@ export default class PersonForm extends Component {
                     </div>
                 </div>
 
+               {this.state.person.id && 
                 <div className="row infected">
                     <div className="col-xs-12">
-                        <button className="btn btn-primary btn-block" type="button" onClick={this.reportInfection}>
+                        {<button className="btn btn-primary btn-block" type="button" onClick={this.reportInfection}>
 
                             {this.state.reported ? 'Você marcou como infectado(a)' : 'Marcar como infectado(a)'}
 
                             {this.state.reporting && (
                                 <i className="fa fa-spinner fa-spin"></i>
                             )}
-                        </button>
+                        </button>}
                     </div>
-                </div>
+                </div>}
                 
                 <div className="row">
                     <div className="col-xs-12">

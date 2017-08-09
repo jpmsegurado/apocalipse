@@ -9,7 +9,9 @@ export default class People extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            page: 1
+        };
         this.loadUser = this.loadUser.bind(this);
     }
 
