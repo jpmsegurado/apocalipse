@@ -44,33 +44,33 @@ export default class Index extends Component {
       <Page withoutContainer>
         <style jsx>
           {`
-                    .login {
-                        display: flex;
-                        position
-                        align-item: center;
-                    }
+            .login {
+                display: flex;
+                position
+                align-item: center;
+            }
 
-                    label {
-                        height: 30px;
-                        margin: 0;  
-                    }
+            label {
+                height: 30px;
+                margin: 0;  
+            }
 
-                    .login {
-                        position: absolute;
-                        margin: auto;
-                        top: 0;
-                        left: 0;
-                        bottom: 0;
-                        right: 0;
-                        height: 239px;
-                        width: 400px;
-                    }
+            .login {
+                position: absolute;
+                margin: auto;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                height: 239px;
+                width: 400px;
+            }
 
-                    .login .jumbotron {
-                        width: 100%;
-                    }
+            .login .jumbotron {
+                width: 100%;
+            }
 
-                `}
+        `}
         </style>
 
         <div className="col-xs-3 col-xs-offset-6 login">

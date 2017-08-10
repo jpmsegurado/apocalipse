@@ -1,3 +1,4 @@
+/* global google */
 import React, { Component, PropTypes } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
@@ -51,32 +52,30 @@ export default class PersonForm extends Component {
     let re;
     let lat;
     let lng;
-    if (!!points) {
-
+    if (points) {
       re = /\((.*)\)/;
       lat = parseFloat(points.match(re)[1].split(' ')[0]);
       lng = parseFloat(points.match(re)[1].split(' ')[1]);
-
     } else {
       lat = -19;
       lng = -45;
     }
 
-    let center = { lat: lat, lng: lng };
-    let map = new google.maps.Map(document.getElementById('map'), {
+    const center = { lat, lng };
+    const map = new google.maps.Map(document.getElementById('map'), {
+      center,
       zoom: 10,
-      center: center
     });
-    let marker = new google.maps.Marker({
+    const marker = new google.maps.Marker({
+      map,
       position: center,
       draggable: true,
-      map: map
     });
 
     map.addListener('center_changed', () => {
-      let center = { lat: map.getCenter().lat(), lng: map.getCenter().lng() };
-      marker.setPosition(center);
-      let newLatLng = `point(${center.lat}, ${center.lng})`;
+      const newCenter = { lat: map.getCenter().lat(), lng: map.getCenter().lng() };
+      marker.setPosition(newCenter);
+      const newLatLng = `point(${newCenter.lat}, ${newCenter.lng})`;
       const person = Object.assign({}, this.state.person, { lonlat: newLatLng });
       this.setState({ person });
     });
@@ -87,39 +86,29 @@ export default class PersonForm extends Component {
     let value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
 
-    if (name === 'infected') value = (value == 'true');
-    if (name === 'age') value = parseInt(value);
+    if (name === 'age') value = parseInt(value, 0);
 
     const person = Object.assign({}, this.state.person, { [name]: value });
 
     this.setState({
-      person
+      person,
     });
-
   }
 
   handleItemChange(event) {
     const name = event.target.name;
-    const value = parseInt(event.target.value);
-
-    let person = this.state.person;
-
-    let index = person.items.findIndex((i) => {
-      return i.name === name;
-    });
-
+    const value = parseInt(event.target.value, 0);
+    const person = this.state.person;
+    const index = person.items.findIndex(i => i.name === name);
     person.items[index].quantity = value;
-
     this.setState({ person });
-
   }
 
-  reportInfection(event) {
-
-    const user = JSON.parse(localStorage.getItem('user'));
+  reportInfection() {
+    const user = JSON.parse(window.localStorage.getItem('user'));
     const params = {
-      infected: this.state.person.id
-    }
+      infected: this.state.person.id,
+    };
     this.setState({ reporting: true });
     return axios.post(`${values.baseUrl}api/people/${user.id}/report_infection.json`, params).then(() => {
       this.setState({ reporting: false, reported: true });
@@ -135,28 +124,23 @@ export default class PersonForm extends Component {
       return axios.patch(`${values.baseUrl}api/people/${this.props.person.id}.json`, this.state.person).then(() => {
         this.setState({ loading: false, success: true });
         window.location.href = '/people';
-      }, (err) => {
-        this.setState({ loading: false, error: true });
-      });
-    } else {
-      let person = Object.assign({}, this.state.person);
-      person.items = person.items.map((elem) => {
-        return `${elem.name}:${elem.quantity}`;
-      }).join(';');
-
-      return axios.post(`${values.baseUrl}api/people.json`, person).then(() => {
-        this.setState({ loading: false, success: true });
-        window.location.href = '/people';
-      }, (err) => {
+      }, () => {
         this.setState({ loading: false, error: true });
       });
     }
+    const person = Object.assign({}, this.state.person);
+    person.items = person.items.map(elem => `${elem.name}:${elem.quantity}`).join(';');
 
+    return axios.post(`${values.baseUrl}api/people.json`, person).then(() => {
+      this.setState({ loading: false, success: true });
+      window.location.href = '/people';
+    }, () => {
+      this.setState({ loading: false, error: true });
+    });
   }
 
 
   render() {
-
     const Span = styled.span`
             height: 20px;
             display: flex;
@@ -169,81 +153,86 @@ export default class PersonForm extends Component {
       <form onSubmit={this.handleSubmit}>
 
         <style jsx>{`
-                    input[type="radio"] {
-                        margin: 0 5px 0 0;
-                    }
+            input[type="radio"] {
+                margin: 0 5px 0 0;
+            }
 
-                    #map {
-                        width: 100%;
-                        height: 400px;
-                    }
+            #map {
+                width: 100%;
+                height: 400px;
+            }
 
-                    .fa {
-                        margin-left: 5px;
-                    }
+            .fa {
+                margin-left: 5px;
+            }
 
-                    .margin-top {
-                        margin-top: 20px;
-                    }
+            .margin-top {
+                margin-top: 20px;
+            }
 
-                    .alert {
-                        margin-top: 10px;
-                    }
+            .alert {
+                margin-top: 10px;
+            }
 
-                    .table td input {
-                        max-width: 100px;
-                    }
+            .table td input {
+                max-width: 100px;
+            }
 
-                    .infected { 
-                        margin: 20px -15px;
-                    }
+            .infected { 
+                margin: 20px -15px;
+            }
 
-                    .btn-link {
-                        margin: 0;
-                        padding: 0;
-                    }
+            .btn-link {
+                margin: 0;
+                padding: 0;
+            }
 
-                `}</style>
+        `}</style>
 
         <div className="row">
           <div className="col-xs-4">
             <div className="form-group">
-              <label>Nome</label>
+              <label htmlFor="label">Nome</label>
               <input
+                id="name"
                 type="text" className="form-control"
                 onChange={this.handleInputChange}
                 name="name"
                 required
-                value={this.state.person.name} />
+                value={this.state.person.name}
+              />
             </div>
           </div>
 
           <div className="col-xs-4">
             <div className="form-group">
-              <label>Idade</label>
+              <label htmlFor="age">Idade</label>
               <input
                 required
+                id="age"
                 type="number" className="form-control"
                 onChange={this.handleInputChange}
                 name="age"
-                value={this.state.person.age} />
+                value={this.state.person.age}
+              />
             </div>
           </div>
 
           <div className="col-xs-4">
             <div className="form-group">
-              <label>Gênero</label><br />
+              <label htmlFor="gender">Gênero</label><br />
               <Span>
                 <input
                   required
                   type="radio"
+                  id="gender"
                   onChange={this.handleInputChange}
                   name="gender"
                   value="M"
-                  checked={this.state.person.gender === 'M'} />
-
+                  checked={this.state.person.gender === 'M'}
+                />
                 Masculino
-                            </Span>
+              </Span>
 
               <Span>
                 <input
@@ -252,10 +241,10 @@ export default class PersonForm extends Component {
                   onChange={this.handleInputChange}
                   name="gender"
                   value="F"
-                  checked={this.state.person.gender === 'F'} />
-
+                  checked={this.state.person.gender === 'F'}
+                />
                 Feminino
-                            </Span>
+              </Span>
             </div>
           </div>
         </div>
@@ -268,7 +257,7 @@ export default class PersonForm extends Component {
                 {this.state.reported ? 'Você marcou como infectado(a)' : 'Marcar como infectado(a)'}
 
                 {this.state.reporting && (
-                  <i className="fa fa-spinner fa-spin"></i>
+                  <i className="fa fa-spinner fa-spin" />
                 )}
               </button>}
             </div>
@@ -281,19 +270,19 @@ export default class PersonForm extends Component {
                 Este sobrevivente não possuí itens no inventório
                             </div>
             }
-            {((this.state.person.id && this.state.person.items.length > 0) || !this.state.person.id) &&
+            {((this.state.person.id && this.state.person.items.length > 0)
+              || !this.state.person.id) &&
               <div>
 
                 <div className="page-header">
                   <h4>
                     Inventário
 
-                                            {(this.state.person.id && !this.state.person['infected?']) &&
-
+                    {(this.state.person.id && !this.state.person['infected?']) &&
                       <Link href={`/trade?id=${this.state.person.id}`} as={`/trade/${this.state.person.id}`}>
                         <a type="button" className="btn btn-link pull-right">
                           Fazer troca de itens
-                                                </a>
+                        </a>
                       </Link>}
 
                   </h4>
@@ -308,10 +297,12 @@ export default class PersonForm extends Component {
 
                   <tbody>
                     {
-                      this.state.person.items.map((item) => (
+                      this.state.person.items.map(item => (
                         <tr key={item.name}>
                           <td>
-                            {!this.state.person.id ? aliases[item.name] : aliases[item.item.name.toLowerCase()]}
+                            {!this.state.person.id ?
+                              aliases[item.name] :
+                              aliases[item.item.name.toLowerCase()]}
                           </td>
                           <td>
                             {this.state.person.id ?
@@ -337,7 +328,7 @@ export default class PersonForm extends Component {
         {(!this.state.person.id || this.state.person.id === this.state.user.id) &&
           <div className="row">
             <div className="col-xs-12">
-              <div id="map"></div>
+              <div id="map" />
             </div>
           </div>}
 
@@ -345,29 +336,20 @@ export default class PersonForm extends Component {
           <div className="col-xs-12">
             <button className="btn btn-primary btn-block" disabled={this.state.loading}>
               Salvar
-
-                            {this.state.loading && (
-                <i className="fa fa-spinner fa-spin"></i>
+              {this.state.loading && (
+                <i className="fa fa-spinner fa-spin" />
               )}
-
             </button>
-
-
-
             {this.state.error && !this.state.loading && (
-
               <div className="alert alert-danger" role="alert">
                 Não foi possível salvar este sobrevivente no momento, tente novamente mais tarde.
-                            </div>
+              </div>
             )}
-
             {this.state.success && !this.state.loading && (
               <div className="alert alert-success" role="alert">
                 Sobrevivente salvo com sucesso.
-                            </div>
+              </div>
             )}
-
-
           </div>
         </div>
 
@@ -377,5 +359,5 @@ export default class PersonForm extends Component {
 }
 
 PersonForm.propTypes = {
-  person: PropTypes.object,
+  person: PropTypes.instanceOf(PropTypes.object),
 };

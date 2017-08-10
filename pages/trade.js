@@ -1,315 +1,297 @@
-import values from '../values';
-import React, { Component } from 'react';
-import Page from '../components/page';
-import PersonForm from '../components/person-form';
+import React, { Component, PropTypes } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
-import styled from 'styled-components';
+import values from '../values';
+import Page from '../components/page';
 
 const aliases = values.aliases;
 
 export default class Trade extends Component {
 
-    constructor(props) {
-        super(props);
+  static async getInitialProps(args) {
+    if (!args.query.id) return { person: {} };
 
-        this.state = {
-            person: props.person,
-            itemsUser: {
-                'water': 0,
-                'ammunition':0,
-                'food': 0,
-                'medication': 0
-            },
-            itemsPerson: {
-                'water': 0,
-                'ammunition':0,
-                'food': 0,
-                'medication': 0
-            }
-        }
+    return axios.get(`${values.baseUrl}api/people/${args.query.id}.json`).then(resp => axios.get(`${values.baseUrl}api/people/${args.query.id}/properties.json`).then((res) => {
+      const person = resp.data;
+      person.items = res.data;
+      return {
+        person,
+      };
+    }));
+  }
 
-        this.changePersonItem = this.changePersonItem.bind(this);
-        this.changeUserItem = this.changeUserItem.bind(this);
-        this.tradeItems = this.tradeItems.bind(this);
+  constructor(props) {
+    super(props);
+    this.state = {
+      person: props.person,
+      itemsUser: {
+        water: 0,
+        ammunition: 0,
+        food: 0,
+        medication: 0,
+      },
+      itemsPerson: {
+        water: 0,
+        ammunition: 0,
+        food: 0,
+        medication: 0,
+      },
+    };
+    this.changePersonItem = this.changePersonItem.bind(this);
+    this.changeUserItem = this.changeUserItem.bind(this);
+    this.tradeItems = this.tradeItems.bind(this);
+  }
 
-    }
-    
-    changePersonItem(event) {
-        const name = event.target.name;
-        const value = event.target.value ? parseInt(event.target.value) : 0;
-        const itemsPerson = Object.assign({}, this.state.itemsPerson, { [name]: value });
-        this.setState({ itemsPerson });
-    }
+  componentDidMount() {
+    this.loadUser();
+  }
 
-    changeUserItem(event) {
-        const name = event.target.name;
-        const value = event.target.value ? parseInt(event.target.value) : 0;
-        const itemsUser = Object.assign({}, this.state.itemsUser, { [name]: value });
-        this.setState({ itemsUser });
-    }
+  getUserPoints() {
+    return (this.state.itemsUser.water * 4) +
+    (this.state.itemsUser.food * 3) +
+    (this.state.itemsUser.medication * 2) +
+    this.state.itemsUser.ammunition;
+  }
 
-    loadUser() {
-        let user = localStorage.getItem('user');
-        if(user) user = JSON.parse(user);
-        
-         axios.get(`${values.baseUrl}api/people/${user.id}/properties.json`).then((res) => {
-            user.items = res.data;
-            this.setState({ user });
-        });
-    }
+  getPersonPoints() {
+    return (this.state.itemsPerson.water * 4) +
+    (this.state.itemsPerson.food * 3) +
+    (this.state.itemsPerson.medication * 2) +
+    this.state.itemsPerson.ammunition;
+  }
 
-    componentDidMount() {
-        this.loadUser();
-    }
+  changeUserItem(event) {
+    const name = event.target.name;
+    const value = event.target.value ? parseInt(event.target.value, 0) : 0;
+    const itemsUser = Object.assign({}, this.state.itemsUser, { [name]: value });
+    this.setState({ itemsUser });
+  }
 
-    getUserPoints() {
-        return this.state.itemsUser.water * 4 + this.state.itemsUser.food * 3 + this.state.itemsUser.medication * 2 + this.state.itemsUser.ammunition;
-    }
+  changePersonItem(event) {
+    const name = event.target.name;
+    const value = event.target.value ? parseInt(event.target.value, 0) : 0;
+    const itemsPerson = Object.assign({}, this.state.itemsPerson, { [name]: value });
+    this.setState({ itemsPerson });
+  }
 
-    getPersonPoints() {
-        return this.state.itemsPerson.water * 4 + this.state.itemsPerson.food * 3 + this.state.itemsPerson.medication * 2 + this.state.itemsPerson.ammunition;
-    }
+  canEnable() {
+    const userPoints = this.getUserPoints();
+    const personPoints = this.getPersonPoints();
+    return !(userPoints > 0 && personPoints > 0 && userPoints === personPoints);
+  }
 
+  loadUser() {
+    let user = window.localStorage.getItem('user');
+    if (user) user = JSON.parse(user);
+    axios.get(`${values.baseUrl}api/people/${user.id}/properties.json`).then((res) => {
+      user.items = res.data;
+      this.setState({ user });
+    });
+  }
 
-    static async getInitialProps(args) {
+  tradeItems() {
+    let personStr = '';
+    let userStr = '';
 
-        if(!args.query.id) return {
-            person: {}
-        };
+    Object.keys(this.state.itemsPerson).forEach((prop) => {
+      personStr = `${personStr}${prop}:${this.state.itemsPerson[prop]};`;
+    });
 
-        return axios.get(`${values.baseUrl}api/people/${args.query.id}.json`).then((resp) => {
+    Object.keys(this.state.itemsUser).forEach((prop) => {
+      userStr = `${userStr}${prop}:${this.state.itemsUser[prop]};`;
+    });
 
-            return axios.get(`${values.baseUrl}api/people/${args.query.id}/properties.json`).then((res) => {
+    const params = {
+      'consumer[name]': this.state.person.name,
+      'consumer[pick]': personStr,
+      'consumer[payment]': userStr,
+    };
 
-                let person = resp.data;
-                person.items = res.data;
-                return {
-                    person: person,
-                }
+    this.setState({ loading: true, error: false, success: false });
 
-            });
+    return axios.post(`${values.baseUrl}api/people/${this.state.user.id}/properties/trade_item.json`, params).then(() => {
+      this.setState({ success: true });
+      setTimeout(() => {
+        window.location.href = `/person/${this.state.person.id}`;
+      }, 1000);
+    }, () => {
+      this.setState({ error: true, loading: false });
+    });
+  }
 
-        }, () => {
-            return;
-        })
-    }
+  render() {
+    return (
+      <Page withoutContainer>
+        <div className="col-xs-10 col-xs-offset-1">
+          <style jsx>
+            {`
+              .btn-link {
+                  margin: 0;
+                  padding: 0;
+              }
 
-    canEnable() {
-        const userPoints = this.getUserPoints();
-        const personPoints = this.getPersonPoints();
-        return !(userPoints > 0 && personPoints > 0 && userPoints === personPoints);
-    }
+              .table .form-control {
+                  max-width: 70px;
+              }
 
-    tradeItems() {
+              td * {
+                  float: left;
+              }
 
-        let personStr = '';
-        let userStr = '';
+              td input {
+                  margin-right: 10px;
+              }
 
-        for(let prop in this.state.itemsPerson) {
-            personStr = `${personStr}${prop}:${this.state.itemsPerson[prop]};`;
-        }
+              td span {
+                  line-height: 35px;
+              }
 
+              .form-control.error {
+                  box-shadow: inset 0 1px 1px rgba(191, 25, 2, 0.6);
+                  border-color: rgb(191, 25, 2);
+              }
+              .btn-primary {
+                  margin-bottom: 10px;
+              }
 
-        for(let prop in this.state.itemsUser) {
-            userStr = `${userStr}${prop}:${this.state.itemsUser[prop]};`;
-        }
-        
-        const params = {
-            'consumer[name]': this.state.person.name,
-            'consumer[pick]': personStr,
-            'consumer[payment]': userStr
-        };
+              .text-center {
+                  color: #666;
+              }
 
-        this.setState({ loading: true, error: false, success: false });
+              .pontuacao {
+                  margin-bottom: 25px;
+              }
 
-        return axios.post(`${values.baseUrl}api/people/${this.state.user.id}/properties/trade_item.json`, params).then(() => {
-            this.setState({ success: true });
-            setTimeout(() => {
-                window.location.href = `/person/${this.state.person.id}`;
-            }, 1000);
-        }, () => {
-            this.setState({ error: true, loading: false });
-        });
-    }
+              .col-xs-6 h4 {
+                  margin-bottom: 25px;
+              }
 
-    render() {
+            `}
+          </style>
 
+          <div className="page-header">
+            <h4>
+              Troca com {this.state.person.name}
+              <Link href={`/person?id=${this.state.person.id}`} as={`/person/${this.state.person.id}`}>
+                <a className="btn btn-link pull-right">Voltar</a>
+              </Link>
+            </h4>
+          </div>
 
-        return (
-            <Page withoutContainer={true}>
+          <div className="col-xs-6">
+            <h4>Seu inventório</h4>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Quantidade para troca</th>
+                </tr>
+              </thead>
+              <tbody>
+                {!!this.state.user && this.state.user.items.map(item => (
+                  <tr key={item.item.name}>
+                    <td>
+                      <span>
+                        {aliases[item.item.name.toLowerCase()]}
+                      </span>
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        className={`form-control ${
+                            this.state.itemsUser[item.item.name.toLowerCase()] > parseInt(item.quantity, 0) ? 'error' : ''
+                        }`}
+                        name={item.item.name.toLowerCase()}
+                        value={this.state.itemsUser[item.item.name.toLowerCase()]}
+                        onChange={this.changeUserItem}
+                      />
 
-               <div className="col-xs-10 col-xs-offset-1">
-                        <style jsx>
-                        {`
-                            .btn-link {
-                                margin: 0;
-                                padding: 0;
-                            }
+                      <span>de {item.quantity}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="pontuacao">
+              Pontuação: {this.getUserPoints()}
+            </p>
+          </div>
 
-                            .table .form-control {
-                                max-width: 70px;
-                            }
+          <div className="col-xs-6">
+            <h4>Inventório de {this.state.person.name}</h4>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Quantidade para troca</th>
+                </tr>
+              </thead>
+              <tbody>
+                {this.state.person.items.map(item => (
+                  <tr key={item.item.name}>
+                    <td>
+                      <span>
+                        {aliases[item.item.name.toLowerCase()]}
+                      </span>
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        className={`form-control ${
+                            this.state.itemsPerson[item.item.name.toLowerCase()] > parseInt(item.quantity, 0) ? 'error' : ''
+                        }`}
+                        name={item.item.name.toLowerCase()}
+                        value={
+                          this.state.itemsPerson[item.item.name.toLowerCase()]
+                        }
+                        onChange={this.changePersonItem}
+                      />
+                      <span>de {item.quantity}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="pontuacao">
+              Pontuação: {this.getPersonPoints()}
+            </p>
+          </div>
 
-                            td * {
-                                float: left;
-                            }
+          <div className="col-xs-12">
+            <button type="button" onClick={this.tradeItems} className="btn btn-primary btn-block primary" disabled={this.canEnable() || this.state.loading}>
+              Confirmar troca
+              {this.state.loading &&
+              <i className="fa fa-spin fa-spinner" />}
+            </button>
+          </div>
 
-                            td input {
-                                margin-right: 10px;
-                            }
+          {this.state.success &&
+          <div className="col-xs-12">
+            <div className="alert alert-success">
+                Troca realizada com sucesso.
+            </div>
+          </div>}
 
-                            td span {
-                                line-height: 35px;
-                            }
+          {this.state.error &&
+          <div className="col-xs-12">
+            <div className="alert alert-danger">
+              Não foi possível realizar esta troca no momento.
+            </div>
+          </div>}
 
-                            .form-control.error {
-                                box-shadow: inset 0 1px 1px rgba(191, 25, 2, 0.6);
-                                border-color: rgb(191, 25, 2);
-                            }
-                            .btn-primary {
-                                margin-bottom: 10px;
-                            }
+          <div className="col-xs-12">
+            <p className="text-center">
+              Lembre-se: a pontuação entre os itens de troca
+              deve ser a mesma, para que ninguém saia perdendo.
+            </p>
+          </div>
+        </div>
 
-                            .text-center {
-                                color: #666;
-                            }
-
-                            .pontuacao {
-                                margin-bottom: 25px;
-                            }
-
-                            .col-xs-6 h4 {
-                                margin-bottom: 25px;
-                            }
-
-                        `}
-                    </style>
-
-                    <div className="page-header">
-                        <h4>
-                            Troca com {this.state.person.name}
-
-                            <Link href={`/person?id=${this.state.person.id}`} as={`/person/${this.state.person.id}`}>
-                                <a className="btn btn-link pull-right">Voltar</a> 
-                            </Link>
-
-                        </h4>
-                    </div>
-
-                    <div className="col-xs-6">
-                        <h4>Seu inventório</h4>
-                        <table className="table">
-                            <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>Quantidade para troca</th>
-                                </tr>
-                            </thead>
-                            
-                            <tbody>
-                                {!!this.state.user &&  this.state.user.items.map((item) => (
-                                        <tr key={item.item.name}>
-                                            <td>
-                                                <span>
-                                                    {aliases[item.item.name.toLowerCase()]}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <input 
-                                                    type="number"
-                                                    className={`form-control ${
-                                                        this.state.itemsUser[item.item.name.toLowerCase()] > parseInt(item.quantity) ? 'error' : ''
-                                                    }`}
-                                                    name={item.item.name.toLowerCase()}
-                                                    value={this.state.itemsUser[item.item.name.toLowerCase()]}
-                                                    onChange={this.changeUserItem}
-                                                    />
-
-                                                    <span>de {item.quantity}</span>
-                                            </td>
-                                        </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        
-                        <p className="pontuacao">
-                            Pontuação: {this.getUserPoints()}
-                        </p>
-
-                    </div>
-
-                    <div className="col-xs-6">
-                        <h4>Inventório de {this.state.person.name}</h4>
-                        <table className="table">
-                            <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>Quantidade para troca</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {this.state.person.items.map((item) => (
-                                        <tr key={item.item.name}>
-                                            <td>
-                                                <span>
-                                                    {aliases[item.item.name.toLowerCase()]}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <input 
-                                                    type="number"
-                                                    className={`form-control ${
-                                                        this.state.itemsPerson[item.item.name.toLowerCase()] > parseInt(item.quantity) ? 'error' : ''
-                                                    }`}
-                                                    name={item.item.name.toLowerCase()}
-                                                    value={this.state.itemsPerson[item.item.name.toLowerCase()]}
-                                                    onChange={this.changePersonItem}
-                                                    />
-
-                                                    <span>de {item.quantity}</span>
-                                            </td>
-                                        </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        
-                        <p className="pontuacao">
-                            Pontuação: {this.getPersonPoints()}
-                        </p>
-
-                    </div>
-
-                    <div className="col-xs-12">
-                        <button type="button" onClick={this.tradeItems} className="btn btn-primary btn-block primary" disabled={this.canEnable() || this.state.loading}>
-                            Confirmar troca
-                            {this.state.loading && 
-                            <i className="fa fa-spin fa-spinner"></i>}
-                        </button>
-                    </div>
-
-                    {this.state.success && 
-                    <div className="col-xs-12"> 
-                        <div className="alert alert-success">
-                            Troca realizada com sucesso.
-                        </div>
-                    </div>}
-
-                    {this.state.error && 
-                    <div className="col-xs-12"> 
-                        <div className="alert alert-danger">
-                            Não foi possível realizar esta troca no momento.
-                        </div>
-                    </div>}
-
-                    <div className="col-xs-12">
-                        <p className="text-center">
-                            Lembre-se: a pontuação entre os itens de troca deve ser a mesma, para que ninguém saia perdendo.
-                        </p>
-                    </div>
-               </div>
-
-            </Page>
-        );
-    }
+      </Page>
+    );
+  }
 }
+
+Trade.propTypes = {
+  person: PropTypes.instanceOf(PropTypes.object),
+};

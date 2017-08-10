@@ -10,7 +10,7 @@ var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _jsxFileName = '/home/joaopedro/Documentos/ProjetosReact/apocalipse/components/page.js';
+var _jsxFileName = '/Users/joaopedro/apps/apocalipse/components/page.js';
 
 
 var Page = function Page(props) {
