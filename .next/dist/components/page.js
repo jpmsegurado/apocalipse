@@ -10,11 +10,11 @@ var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _jsxFileName = '/Users/joaopedro/apps/apocalipse/components/page.js';
+var _jsxFileName = '/home/joaopedro/Documentos/ProjetosReact/apocalipse/components/page.js';
 
 
 var Page = function Page(props) {
-  return _react2.default.createElement('div', { style: { margin: 0, padding: 0 }, className: props.withoutContainer ? '' : 'container', __source: {
+  return _react2.default.createElement('div', { className: props.withoutContainer ? '' : 'container', __source: {
       fileName: _jsxFileName,
       lineNumber: 4
     }
@@ -40,5 +40,4 @@ var Page = function Page(props) {
 Page.propTypes = {
   withoutContainer: _react.PropTypes.boolean
 };
-
 exports.default = Page;

@@ -1,129 +1,122 @@
-import values from '../values';
-import React, { Component } from 'react';
-import Page from '../components/page';
+import React, { Component, PropTypes } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
-import Router from 'next/router'
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
+import Page from '../components/page';
+import values from '../values';
 
 
 export default class People extends Component {
 
-    constructor(props) {
-        super(props);
-        const page = 1;
-        const take = 10;
-        const start = (page - 1) * take;
-        const end = (page * take) - 1;
-        this.state = {
-            start,
-            end,
-            take: take
-        };
-        this.loadUser = this.loadUser.bind(this);
-    }
+  static async getInitialProps() {
+    return axios.get(`${values.baseUrl}api/people.json`).then((resp) => {
+      const itens = resp.data.map((person) => {
+        const newPerson = Object.assign({}, person);
+        newPerson.status = newPerson['infected?'] ? 'Infectado' : 'não Infectado';
+        newPerson.genderLabel = newPerson.gender === 'M' ? 'Masculino' : 'Feminino';
+        return newPerson;
+      });
+      const headers = [
+        'Nome',
+        'Idade',
+        'Gênero',
+        'Infectado',
+      ];
 
-    loadUser() {
-        let user = localStorage.getItem('user');
-        if(user) user = JSON.parse(user);
-        this.setState({ user });
-    }
+      return {
+        headers,
+        itens,
+      };
+    });
+  }
 
-    componentDidMount() {
-        this.loadUser();
-    }
+  constructor(props) {
+    super(props);
+    const page = 1;
+    const take = 10;
+    const start = (page - 1) * take;
+    const end = (page * take) - 1;
+    this.state = {
+      start,
+      end,
+      take,
+    };
+    this.loadUser = this.loadUser.bind(this);
+  }
 
+  componentDidMount() {
+    this.loadUser();
+  }
 
-    static async getInitialProps() {
-        return axios.get(`${values.baseUrl}api/people.json`).then((resp) => {
-            const itens = resp.data.map((person) => {
-                person.status = person['infected?'] ? 'Infectado' : 'não Infectado';
-                person.genderLabel = person.gender === 'M' ? 'Masculino' : 'Feminino';
-                return person;
-            });
-            const headers = [
-                'Nome',
-                'Idade',
-                'Gênero',
-                'Infectado'
-            ];
+  loadUser() {
+    let user = window.localStorage.getItem('user');
+    if (user) user = JSON.parse(user);
+    this.setState({ user });
+  }
 
-            return {
-                headers,
-                itens: itens,
+  render() {
+    return (
+      <Page>
+
+        <style jsx>
+          {`
+            .margin-bottom {
+                margin-bottom: 10px;
             }
-        }, () => {
-            return;
-        })
-    }
 
-    onRowClick(row) {
-        window.location.href = `/person/${row.location.split('/').pop()}`;
-    }
+            .clickable {
+                cursor: pointer;
+            }
+            
 
-    setPagination(page) {
-        const start = (page - 1) * this.state.take;
-        const end = (page * this.state.take) - 1;
-    }
+            .my-table {
+                cursor: pointer;
+            }
 
-    render() {
-        return (
-            <Page>
+        `}
+        </style>
 
-                <style jsx>
-                    {`
-                        .margin-bottom {
-                            margin-bottom: 10px;
-                        }
-
-                        .clickable {
-                            cursor: pointer;
-                        }
-                        
-
-                        .my-table {
-                            cursor: pointer;
-                        }
-
-                    `}
-                </style>
-
-                <div className="page-header" onLoad={this.loadUser}>
-                    <h4>
-                        Sobreviventes
-                        {   
-                            this.state.user && 
-                            <Link href={`/person?id=${this.state.user.id}`} as={`/person/${this.state.user.id}`}>
-                                    <button className="btn btn-link pull-right">
-                                        Ver meu perfil
+        <div className="page-header" onLoad={this.loadUser}>
+          <h4>
+            Sobreviventes
+                        {
+              this.state.user &&
+              <Link href={`/person?id=${this.state.user.id}`} as={`/person/${this.state.user.id}`}>
+                <button className="btn btn-link pull-right">
+                  Ver meu perfil
                                     </button>
-                            </Link>
-                        }
+              </Link>
+            }
 
-                        <span className="pull-right"></span>
+            <span className="pull-right" />
 
-                    </h4>
-                </div>
+          </h4>
+        </div>
 
-                <Link href={`/person`}>
-                    <button className="btn btn-primary margin-bottom">Novo sobrevivente</button>
-                </Link>
+        <Link href={'/person'}>
+          <button className="btn btn-primary margin-bottom">Novo sobrevivente</button>
+        </Link>
 
-                <div className="my-table">
-                    <BootstrapTable 
-                        trClassName={'clickable'} data={this.props.itens} search striped 
-                        searchPlaceholder='Pesquisar...' hover
-                        pagination options={{ onRowClick: this.onRowClick }}>
-                        <TableHeaderColumn isKey={true} dataField='name'> 
-                            Nome
-                        </TableHeaderColumn>
-                        <TableHeaderColumn dataField='genderLabel'>Gênero</TableHeaderColumn>
-                        <TableHeaderColumn dataField='age'>Idade</TableHeaderColumn>
-                        <TableHeaderColumn dataField='status'>Infectado</TableHeaderColumn>
-                    </BootstrapTable>
-                </div>
+        <div className="my-table">
+          <BootstrapTable
+            trClassName={'clickable'} data={this.props.itens} search striped
+            searchPlaceholder="Pesquisar..." hover
+            pagination options={{ onRowClick: (row) => { window.location.href = `/person/${row.location.split('/').pop()}`; } }}
+          >
+            <TableHeaderColumn isKey dataField="name">
+              Nome
+            </TableHeaderColumn>
+            <TableHeaderColumn dataField="genderLabel">Gênero</TableHeaderColumn>
+            <TableHeaderColumn dataField="age">Idade</TableHeaderColumn>
+            <TableHeaderColumn dataField="status">Infectado</TableHeaderColumn>
+          </BootstrapTable>
+        </div>
 
-            </Page>
-        );
-    }
+      </Page>
+    );
+  }
 }
+
+People.propTypes = {
+  itens: PropTypes.arrayOf(PropTypes.object),
+};
