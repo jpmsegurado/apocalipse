@@ -122,7 +122,7 @@ export default class Trade extends Component {
 
   render() {
     return (
-      <Page withoutContainer>
+      <Page>
         <div className="col-xs-10 col-xs-offset-1">
           <style jsx>
             {`

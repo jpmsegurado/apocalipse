@@ -23,6 +23,11 @@ export default class Person extends Component {
   render() {
     return (<Page>
       <div className="col-xs-8 col-xs-offset-2">
+        <style jsx>{`
+          .page-header {
+            margin-top: 0px;
+          }
+        `}</style>
         <div className="page-header">
           <h4>
             Informações do sobrevivente

@@ -113,6 +113,10 @@ export default class People extends Component {
               margin-left: 10px;
             }
 
+            .page-header {
+              margin-top: 9px;
+            }
+
         `}
         </style>
 
@@ -151,7 +155,7 @@ export default class People extends Component {
         <div className="my-table">
           <BootstrapTable
             noDataText="Nenhum sobrevivente foi encontrado" withoutNoDataText
-            trClassName={'clickable'} data={this.getFilteredItens(this.props.itens)} striped
+            trClassName={'clickable'} data={this.getFilteredItens(this.props.itens)}
             hover
             pagination options={{ onRowClick: (row) => { window.location.href = `/person/${row.location.split('/').pop()}`; } }}
           >

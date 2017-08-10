@@ -76,7 +76,7 @@ export default class PersonForm extends Component {
     map.addListener('center_changed', () => {
       const newCenter = { lat: map.getCenter().lat(), lng: map.getCenter().lng() };
       marker.setPosition(newCenter);
-      const newLatLng = `point(${newCenter.lat}, ${newCenter.lng})`;
+      const newLatLng = `point(${newCenter.lat} ${newCenter.lng})`;
       const person = Object.assign({}, this.state.person, { lonlat: newLatLng });
       this.setState({ person });
     });
