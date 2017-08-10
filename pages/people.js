@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import { PropTypes } from 'prop-types';
 import axios from 'axios';
 import Link from 'next/link';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
@@ -12,7 +13,7 @@ export default class People extends Component {
     return axios.get(`${values.baseUrl}api/people.json`).then((resp) => {
       const itens = resp.data.map((person) => {
         const newPerson = Object.assign({}, person);
-        newPerson.status = newPerson['infected?'] ? 'Infectado' : 'não Infectado';
+        newPerson.status = newPerson['infected?'] ? 'Infectado' : 'Não Infectado';
         newPerson.genderLabel = newPerson.gender === 'M' ? 'Masculino' : 'Feminino';
         return newPerson;
       });
@@ -40,12 +41,47 @@ export default class People extends Component {
       start,
       end,
       take,
+      search: '',
     };
     this.loadUser = this.loadUser.bind(this);
+    this.changeSearch = this.changeSearch.bind(this);
+    this.getFilteredItens = this.getFilteredItens.bind(this);
   }
 
   componentDidMount() {
     this.loadUser();
+  }
+
+  getFilteredItens(itens) {
+    let search = this.state.search;
+    if (!search) return itens;
+    search = this.removeSpecialChars(search).toLowerCase();
+    return itens.filter((item) => {
+      const removedSpecial = this.removeSpecialChars(item.name).toLowerCase();
+      return removedSpecial.indexOf(search) > -1 || item.age === parseInt(search, 0);
+    });
+  }
+
+  removeSpecialChars = (s) => {
+    const special = 'áàãâäéèêëíìîïóòõôöúùûüçÁÀÃÂÄÉÈÊËÍÌÎÏÓÒÕÖÔÚÙÛÜÇ';
+    const normal = 'aaaaaeeeeiiiiooooouuuucAAAAAEEEEIIIIOOOOOUUUUC';
+    let newString = '';
+
+    Object.keys(s).forEach((key) => {
+      const index = special.indexOf(s[key]);
+      if (index > 0) {
+        newString += normal.substring(index, 1);
+      } else {
+        newString += s[key];
+      }
+    });
+
+    return newString;
+  }
+
+  changeSearch(event) {
+    const search = event.target.value;
+    this.setState({ search });
   }
 
   loadUser() {
@@ -73,34 +109,50 @@ export default class People extends Component {
                 cursor: pointer;
             }
 
+            .pull-right i {
+              margin-left: 10px;
+            }
+
         `}
         </style>
 
         <div className="page-header" onLoad={this.loadUser}>
           <h4>
             Sobreviventes
-                        {
+            {
               this.state.user &&
               <Link href={`/person?id=${this.state.user.id}`} as={`/person/${this.state.user.id}`}>
                 <button className="btn btn-link pull-right">
                   Ver meu perfil
-                                    </button>
+                </button>
               </Link>
             }
-
             <span className="pull-right" />
 
           </h4>
         </div>
 
-        <Link href={'/person'}>
-          <button className="btn btn-primary margin-bottom">Novo sobrevivente</button>
-        </Link>
+        <div className="row">
+
+          <div className="col-xs-6">
+            <input onChange={this.changeSearch} className="form-control" type="text" placeholder="Pesquisar por..." />
+          </div>
+
+          <div className="col-xs-6">
+            <Link href={'/person'}>
+              <button className="btn btn-primary margin-bottom pull-right">
+                Novo sobrevivente
+                <i className="fa fa-plus" />
+              </button>
+            </Link>
+          </div>
+        </div>
 
         <div className="my-table">
           <BootstrapTable
-            trClassName={'clickable'} data={this.props.itens} search striped
-            searchPlaceholder="Pesquisar..." hover
+            noDataText="Nenhum sobrevivente foi encontrado" withoutNoDataText
+            trClassName={'clickable'} data={this.getFilteredItens(this.props.itens)} striped
+            hover
             pagination options={{ onRowClick: (row) => { window.location.href = `/person/${row.location.split('/').pop()}`; } }}
           >
             <TableHeaderColumn isKey dataField="name">

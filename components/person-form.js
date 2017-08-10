@@ -1,5 +1,6 @@
 /* global google */
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import { PropTypes } from 'prop-types';
 import axios from 'axios';
 import Link from 'next/link';
 import styled from 'styled-components';

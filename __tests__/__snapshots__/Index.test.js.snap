@@ -2,10 +2,14 @@
 
 exports[`With Snapshot Testing Label shows "Usuário" 1`] = `
 <div
-  className="sc-bdVaJa hwOTrO"
+  className=""
 >
   <link
     href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://npmcdn.com/react-bootstrap-table/dist/react-bootstrap-table-all.min.css"
     rel="stylesheet"
   />
   <link
@@ -17,29 +21,31 @@ exports[`With Snapshot Testing Label shows "Usuário" 1`] = `
   />
   <div
     className="col-xs-3 col-xs-offset-6 login"
-    data-jsx={2306171780}
+    data-jsx={993884036}
   >
     <div
       className="jumbotron"
-      data-jsx={2306171780}
+      data-jsx={993884036}
     >
       <form
         className="container"
-        data-jsx={2306171780}
+        data-jsx={993884036}
         onSubmit={[Function]}
       >
         <div
           className="form-group"
-          data-jsx={2306171780}
+          data-jsx={993884036}
         >
           <label
-            data-jsx={2306171780}
+            data-jsx={993884036}
+            htmlFor="id"
           >
             Usuário
           </label>
           <input
             className="form-control"
-            data-jsx={2306171780}
+            data-jsx={993884036}
+            id="id"
             name="id"
             onChange={[Function]}
             placeholder="Seu ID"
@@ -48,7 +54,7 @@ exports[`With Snapshot Testing Label shows "Usuário" 1`] = `
         </div>
         <button
           className="btn btn-primary btn-block"
-          data-jsx={2306171780}
+          data-jsx={993884036}
           disabled={undefined}
           type="submit"
         >

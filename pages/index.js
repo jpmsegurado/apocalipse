@@ -41,7 +41,7 @@ export default class Index extends Component {
 
   render() {
     return (
-      <Page withoutContainer>
+      <Page withoutContainer={() => true}>
         <style jsx>
           {`
             .login {
@@ -97,7 +97,7 @@ export default class Index extends Component {
 
                 <div className="alert alert-danger" role="alert">
                   Usuário não encontrado
-                                </div>
+                </div>
               )}
 
             </form>

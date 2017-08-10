@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import { PropTypes } from 'prop-types';
 
 const Page = props => (
   <div className={props.withoutContainer ? '' : 'container'}>
@@ -11,6 +12,6 @@ const Page = props => (
 );
 
 Page.propTypes = {
-  withoutContainer: PropTypes.boolean,
+  withoutContainer: PropTypes.func,
 };
 export default Page;
