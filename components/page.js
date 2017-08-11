@@ -19,14 +19,22 @@ const Page = props => (
       <link rel="stylesheet" href="https://npmcdn.com/react-bootstrap-table/dist/react-bootstrap-table-all.min.css" />
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
       <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAD3yTq68bvCM8xkUSaByG3LETyCQaRzmU" />
+      {!props.withoutCard &&
       <Card>
         {props.children}
-      </Card>
+      </Card>}
+
+      {props.withoutCard &&
+      <div>
+        {props.children}
+      </div>}
+
     </div>
   </Body>
 );
 
 Page.propTypes = {
-  withoutContainer: PropTypes.func,
+  withoutContainer: PropTypes.bool,
+  withoutCard: PropTypes.bool,
 };
 export default Page;

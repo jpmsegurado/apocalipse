@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import values from '../values';
+import values from '../providers/values';
 import Page from '../components/page';
+import Card from '../components/card';
 
 export default class Index extends Component {
 
@@ -41,7 +42,7 @@ export default class Index extends Component {
 
   render() {
     return (
-      <Page withoutContainer={() => true}>
+      <Page withoutContainer withoutCard>
         <style jsx>
           {`
             .login {
@@ -66,15 +67,15 @@ export default class Index extends Component {
                 width: 400px;
             }
 
-            .login .jumbotron {
+            .login .container {
                 width: 100%;
             }
 
         `}
         </style>
 
-        <div className="col-xs-3 col-xs-offset-6 login">
-          <div className="jumbotron">
+        <div className="login">
+          <Card>
             <form className="container" onSubmit={this.submit}>
               <div className="form-group">
                 <label htmlFor="id">Usuário</label>
@@ -101,7 +102,7 @@ export default class Index extends Component {
               )}
 
             </form>
-          </div>
+          </Card>
         </div>
       </Page>
     );

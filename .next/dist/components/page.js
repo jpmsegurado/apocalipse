@@ -55,15 +55,21 @@ var Page = function Page(props) {
       fileName: _jsxFileName,
       lineNumber: 21
     }
-  }), _react2.default.createElement(_card2.default, {
+  }), !props.withoutCard && _react2.default.createElement(_card2.default, {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 22
+      lineNumber: 23
+    }
+  }, props.children), props.withoutCard && _react2.default.createElement('div', {
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 28
     }
   }, props.children)));
 };
 
 Page.propTypes = {
-  withoutContainer: _propTypes.PropTypes.func
+  withoutContainer: _propTypes.PropTypes.bool,
+  withoutCard: _propTypes.PropTypes.bool
 };
 exports.default = Page;

@@ -4,7 +4,7 @@ import { PropTypes } from 'prop-types';
 import axios from 'axios';
 import Link from 'next/link';
 import styled from 'styled-components';
-import values from '../values';
+import values from '../providers/values';
 
 const aliases = values.aliases;
 
@@ -14,15 +14,6 @@ export default class PersonForm extends Component {
     super(props);
 
     const person = props.person;
-    if (!person.items) {
-      person.items = [
-        { name: 'water', quantity: 0 },
-        { name: 'ammunition', quantity: 0 },
-        { name: 'food', quantity: 0 },
-        { name: 'medication', quantity: 0 },
-      ];
-    }
-
     this.state = {
       person,
       user: {},
@@ -34,19 +25,18 @@ export default class PersonForm extends Component {
     this.reportInfection = this.reportInfection.bind(this);
   }
 
+  // componentDidMount() {
+  //   this.loadUser();
+  //   setTimeout(() => {
+  //     if (!this.state.person.id || this.state.person.id === this.state.user.id) this.loadMap();
+  //   }, 1000);
+  // }
 
-  componentDidMount() {
-    this.loadUser();
-    setTimeout(() => {
-      if (!this.state.person.id || this.state.person.id === this.state.user.id) this.loadMap();
-    }, 1000);
-  }
-
-  loadUser() {
-    let user = window.localStorage.getItem('user');
-    if (user) user = JSON.parse(user);
-    this.setState({ user });
-  }
+  // loadUser() {
+  //   let user = window.localStorage.getItem('user');
+  //   if (user) user = JSON.parse(user);
+  //   this.setState({ user });
+  // }
 
   loadMap() {
     const points = this.props.person.lonlat;
@@ -193,7 +183,7 @@ export default class PersonForm extends Component {
         <div className="row">
           <div className="col-xs-4">
             <div className="form-group">
-              <label htmlFor="label">Nome</label>
+              <label htmlFor="name">Nome</label>
               <input
                 id="name"
                 type="text" className="form-control"
@@ -266,10 +256,10 @@ export default class PersonForm extends Component {
 
         <div className="row">
           <div className="col-xs-12">
-            {this.state.person.id && this.state.person.items.length === 0 &&
+            {this.props.person.id && this.props.person.items.length === 0 &&
               <div className="alert alert-warning" role="alert">
                 Este sobrevivente não possuí itens no inventório
-                            </div>
+              </div>
             }
             {((this.state.person.id && this.state.person.items.length > 0)
               || !this.state.person.id) &&
@@ -299,7 +289,12 @@ export default class PersonForm extends Component {
                   <tbody>
                     {
                       this.state.person.items.map(item => (
-                        <tr key={item.name}>
+                        <tr
+                          key={!this.state.person.id ?
+                          aliases[item.name] :
+                          aliases[item.item.name.toLowerCase()]}
+                          className="inventory-item"
+                        >
                           <td>
                             {!this.state.person.id ?
                               aliases[item.name] :
@@ -360,5 +355,5 @@ export default class PersonForm extends Component {
 }
 
 PersonForm.propTypes = {
-  person: PropTypes.instanceOf(PropTypes.object),
+  person: PropTypes.objectOf(PropTypes.any),
 };

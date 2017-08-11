@@ -4,7 +4,7 @@ import axios from 'axios';
 import Link from 'next/link';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import Page from '../components/page';
-import values from '../values';
+import values from '../providers/values';
 
 
 export default class People extends Component {
@@ -43,14 +43,14 @@ export default class People extends Component {
       take,
       search: '',
     };
-    this.loadUser = this.loadUser.bind(this);
+    // this.loadUser = this.loadUser.bind(this);
     this.changeSearch = this.changeSearch.bind(this);
     this.getFilteredItens = this.getFilteredItens.bind(this);
   }
 
-  componentDidMount() {
-    this.loadUser();
-  }
+  // componentDidMount() {
+  //   this.loadUser();
+  // }
 
   getFilteredItens(itens) {
     let search = this.state.search;
@@ -84,11 +84,11 @@ export default class People extends Component {
     this.setState({ search });
   }
 
-  loadUser() {
-    let user = window.localStorage.getItem('user');
-    if (user) user = JSON.parse(user);
-    this.setState({ user });
-  }
+  // loadUser() {
+  //   let user = window.localStorage.getItem('user');
+  //   if (user) user = JSON.parse(user);
+  //   this.setState({ user });
+  // }
 
   render() {
     return (
@@ -120,7 +120,7 @@ export default class People extends Component {
         `}
         </style>
 
-        <div className="page-header" onLoad={this.loadUser}>
+        <div className="page-header">
           <h4>
             Sobreviventes
             {
@@ -154,6 +154,7 @@ export default class People extends Component {
 
         <div className="my-table">
           <BootstrapTable
+            striped
             noDataText="Nenhum sobrevivente foi encontrado" withoutNoDataText
             trClassName={'clickable'} data={this.getFilteredItens(this.props.itens)}
             hover
