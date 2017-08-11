@@ -2,9 +2,9 @@
 import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
 import axios from 'axios';
-import Link from 'next/link';
 import styled from 'styled-components';
 import values from '../providers/values';
+import Loading from '../components/loading';
 
 const aliases = values.aliases;
 
@@ -31,6 +31,7 @@ export default class PersonForm extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleItemChange = this.handleItemChange.bind(this);
     this.reportInfection = this.reportInfection.bind(this);
+    this.trade = this.trade.bind(this);
   }
 
   componentDidMount() {
@@ -133,6 +134,10 @@ export default class PersonForm extends Component {
     });
   }
 
+  trade() {
+    this.setState({ loadingRoute: true });
+    window.location.href = `/trade/${this.state.person.id}`;
+  }
 
   render() {
     const Span = styled.span`
@@ -253,16 +258,12 @@ export default class PersonForm extends Component {
             {((this.state.person.id && this.state.person.items.length > 0)
               || !this.state.person.id) &&
               <div>
-
                 <div className="page-header">
                   <h4>
                     Inventário
-
-                    {(this.state.person.id && !this.state.person['infected?']) &&
-                      <a type="button" className="btn btn-link pull-right" onClick={this.trade}>
-                        Fazer troca de itens
-                      </a>}
-
+                    {!this.state.person['infected?'] && <button type="button" className="btn btn-link pull-right" onClick={this.trade}>
+                      Fazer troca de itens
+                    </button>}
                   </h4>
                 </div>
                 <table className="table table-striped">
@@ -353,6 +354,8 @@ export default class PersonForm extends Component {
             )}
           </div>
         </div>
+
+        {this.state.loadingRoute && <Loading />}
 
       </form>
     );
