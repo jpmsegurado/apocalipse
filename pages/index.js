@@ -1,110 +1,177 @@
 import React, { Component } from 'react';
+import { PropTypes } from 'prop-types';
 import axios from 'axios';
-import values from '../providers/values';
+import Link from 'next/link';
+import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import Page from '../components/page';
-import Card from '../components/card';
+import Loading from '../components/loading';
+import values from '../providers/values';
+
 
 export default class Index extends Component {
 
+  static async getInitialProps() {
+    return axios.get(`${values.baseUrl}api/people.json`).then((resp) => {
+      const itens = resp.data.map((person) => {
+        const newPerson = Object.assign({}, person);
+        newPerson.status = newPerson['infected?'] ? 'Infectado' : 'Não Infectado';
+        newPerson.genderLabel = newPerson.gender === 'M' ? 'Masculino' : 'Feminino';
+        return newPerson;
+      });
+      const headers = [
+        'Nome',
+        'Idade',
+        'Gênero',
+        'Infectado',
+      ];
+
+      return {
+        headers,
+        itens,
+      };
+    });
+  }
+
   constructor(props) {
     super(props);
-    this.submit = this.submit.bind(this);
-    this.changedId = this.changedId.bind(this);
-    this.state = {};
+    const page = 1;
+    const take = 10;
+    const start = (page - 1) * take;
+    const end = (page * take) - 1;
+    this.state = {
+      start,
+      end,
+      take,
+      search: '',
+    };
+    this.changeSearch = this.changeSearch.bind(this);
+    this.getFilteredItens = this.getFilteredItens.bind(this);
+    this.onRowClick = this.onRowClick.bind(this);
   }
 
+  onRowClick(row) {
+    window.location.href = `/person/${row.location.split('/').pop()}`;
+    this.setState({ loadingRoute: true });
+  }
 
-  submit(event) {
-    event.preventDefault();
-
-    this.setState({ loading: true, error: false });
-
-    return axios.get(`${values.baseUrl}api/people/${this.state.id}.json`).then((res) => {
-      const user = res.data;
-
-      window.localStorage.setItem('user', JSON.stringify(user));
-      window.location.href = '/people';
-
-      this.setState({ error: false });
-    }, () => {
-      this.setState({ loading: false, error: true });
+  getFilteredItens(itens) {
+    let search = this.state.search;
+    if (!search) return itens;
+    search = this.removeSpecialChars(search).toLowerCase();
+    return itens.filter((item) => {
+      const removedSpecial = this.removeSpecialChars(item.name).toLowerCase();
+      return removedSpecial.indexOf(search) > -1 || item.age === parseInt(search, 0);
     });
   }
 
-  changedId(event) {
-    const value = event.target.value;
+  removeSpecialChars = (s) => {
+    const special = 'áàãâäéèêëíìîïóòõôöúùûüçÁÀÃÂÄÉÈÊËÍÌÎÏÓÒÕÖÔÚÙÛÜÇ';
+    const normal = 'aaaaaeeeeiiiiooooouuuucAAAAAEEEEIIIIOOOOOUUUUC';
+    let newString = '';
 
-    this.setState({
-      id: value,
+    Object.keys(s).forEach((key) => {
+      const index = special.indexOf(s[key]);
+      if (index > 0) {
+        newString += normal.substring(index, 1);
+      } else {
+        newString += s[key];
+      }
     });
+
+    return newString;
   }
 
+  changeSearch(event) {
+    const search = event.target.value;
+    this.setState({ search });
+  }
 
   render() {
     return (
-      <Page withoutContainer withoutCard>
+      <Page>
+
         <style jsx>
           {`
-            .login {
-                display: flex;
-                position
-                align-item: center;
+            .margin-bottom {
+                margin-bottom: 10px;
             }
 
-            label {
-                height: 30px;
-                margin: 0;  
+            .clickable {
+                cursor: pointer;
+            }
+            
+
+            .my-table {
+                cursor: pointer;
             }
 
-            .login {
-                position: absolute;
-                margin: auto;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                right: 0;
-                height: 239px;
-                width: 400px;
+            .pull-right i {
+              margin-left: 10px;
             }
 
-            .login .container {
-                width: 100%;
+            .page-header {
+              margin-top: 9px;
             }
 
         `}
         </style>
 
-        <div className="login">
-          <Card>
-            <form className="container" onSubmit={this.submit}>
-              <div className="form-group">
-                <label htmlFor="id">Usuário</label>
-                <input
-                  id="id"
-                  name="id"
-                  className="form-control"
-                  onChange={this.changedId}
-                  type="text"
-                  placeholder="Seu ID"
-                />
-              </div>
+        <div className="page-header">
+          <h4>
+            Sobreviventes
+            {
+              this.state.user &&
+              <Link href={`/person?id=${this.state.user.id}`} as={`/person/${this.state.user.id}`}>
+                <button className="btn btn-link pull-right">
+                  Ver meu perfil
+                </button>
+              </Link>
+            }
+            <span className="pull-right" />
 
-              <button type="submit" className="btn btn-primary btn-block" disabled={this.state.loading}>
-                Entrar
-                {this.state.loading && (<i className="fa fa-spinner fa-spin" />)}
-              </button>
-
-              {this.state.error && !this.state.loading && (
-
-                <div className="alert alert-danger" role="alert">
-                  Usuário não encontrado
-                </div>
-              )}
-
-            </form>
-          </Card>
+          </h4>
         </div>
+
+        <div className="row">
+
+          <div className="col-xs-6">
+            <input onChange={this.changeSearch} className="form-control" type="text" placeholder="Pesquisar por..." />
+          </div>
+
+          <div className="col-xs-6">
+            <Link href={'/person'}>
+              <button className="btn btn-primary margin-bottom pull-right">
+                Novo sobrevivente
+                <i className="fa fa-plus" />
+              </button>
+            </Link>
+          </div>
+        </div>
+
+        <div className="my-table">
+          <BootstrapTable
+            striped
+            noDataText="Nenhum sobrevivente foi encontrado" withoutNoDataText
+            trClassName={'clickable'} data={this.getFilteredItens(this.props.itens)}
+            hover
+            pagination options={{ onRowClick: this.onRowClick }}
+          >
+            <TableHeaderColumn isKey dataField="name">
+              Nome
+            </TableHeaderColumn>
+            <TableHeaderColumn dataField="genderLabel">Gênero</TableHeaderColumn>
+            <TableHeaderColumn dataField="age">Idade</TableHeaderColumn>
+            <TableHeaderColumn dataField="status">Infectado</TableHeaderColumn>
+          </BootstrapTable>
+        </div>
+
+        {this.state.loadingRoute && <Loading />}
+
       </Page>
     );
   }
 }
+
+Index.propTypes = {
+  itens: PropTypes.arrayOf(PropTypes.object),
+};

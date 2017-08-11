@@ -14,6 +14,14 @@ export default class PersonForm extends Component {
     super(props);
 
     const person = props.person;
+    if (!person.items && !person.id) {
+      person.items = [
+        { name: 'water', quantity: 0 },
+        { name: 'ammunition', quantity: 0 },
+        { name: 'food', quantity: 0 },
+        { name: 'medication', quantity: 0 },
+      ];
+    }
     this.state = {
       person,
       user: {},
@@ -25,18 +33,11 @@ export default class PersonForm extends Component {
     this.reportInfection = this.reportInfection.bind(this);
   }
 
-  // componentDidMount() {
-  //   this.loadUser();
-  //   setTimeout(() => {
-  //     if (!this.state.person.id || this.state.person.id === this.state.user.id) this.loadMap();
-  //   }, 1000);
-  // }
-
-  // loadUser() {
-  //   let user = window.localStorage.getItem('user');
-  //   if (user) user = JSON.parse(user);
-  //   this.setState({ user });
-  // }
+  componentDidMount() {
+    setTimeout(() => {
+      if (!this.state.person.id || this.state.person.id === this.state.user.id) this.loadMap();
+    }, 1000);
+  }
 
   loadMap() {
     const points = this.props.person.lonlat;
@@ -108,23 +109,25 @@ export default class PersonForm extends Component {
     });
   }
 
+  capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1)
+
   handleSubmit(event) {
     event.preventDefault();
     this.setState({ loading: true, error: false, success: false });
     if (this.state.person.id) {
       return axios.patch(`${values.baseUrl}api/people/${this.props.person.id}.json`, this.state.person).then(() => {
         this.setState({ loading: false, success: true });
-        window.location.href = '/people';
+        window.location.href = '/';
       }, () => {
         this.setState({ loading: false, error: true });
       });
     }
     const person = Object.assign({}, this.state.person);
-    person.items = person.items.map(elem => `${elem.name}:${elem.quantity}`).join(';');
+    person.items = person.items.map(elem => `${this.capitalizeFirstLetter(elem.name)}:${elem.quantity}`).join(';');
 
     return axios.post(`${values.baseUrl}api/people.json`, person).then(() => {
       this.setState({ loading: false, success: true });
-      window.location.href = '/people';
+      window.location.href = '/';
     }, () => {
       this.setState({ loading: false, error: true });
     });
@@ -240,20 +243,6 @@ export default class PersonForm extends Component {
           </div>
         </div>
 
-        {(this.state.person.id && this.state.user.id !== this.state.person.id) &&
-          <div className="row infected">
-            <div className="col-xs-12">
-              {<button className="btn btn-primary btn-block" type="button" onClick={this.reportInfection}>
-
-                {this.state.reported ? 'Você marcou como infectado(a)' : 'Marcar como infectado(a)'}
-
-                {this.state.reporting && (
-                  <i className="fa fa-spinner fa-spin" />
-                )}
-              </button>}
-            </div>
-          </div>}
-
         <div className="row">
           <div className="col-xs-12">
             {this.props.person.id && this.props.person.items.length === 0 &&
@@ -270,11 +259,9 @@ export default class PersonForm extends Component {
                     Inventário
 
                     {(this.state.person.id && !this.state.person['infected?']) &&
-                      <Link href={`/trade?id=${this.state.person.id}`} as={`/trade/${this.state.person.id}`}>
-                        <a type="button" className="btn btn-link pull-right">
-                          Fazer troca de itens
-                        </a>
-                      </Link>}
+                      <a type="button" className="btn btn-link pull-right" onClick={this.trade}>
+                        Fazer troca de itens
+                      </a>}
 
                   </h4>
                 </div>
@@ -328,14 +315,32 @@ export default class PersonForm extends Component {
             </div>
           </div>}
 
+        {this.state.person['infected?'] && <div className="alert alert-danger">
+          Este sobrevivente está infectado!
+        </div>}
+
+        {(this.state.person.id && this.state.user.id !== this.state.person.id && !this.state.person['infected?']) &&
+        <div className="row infected">
+          <div className="col-xs-12">
+            {<button className="btn btn-primary btn-block" type="button" onClick={this.reportInfection}>
+
+              {this.state.reported ? 'Você marcou como infectado(a)' : 'Marcar como infectado(a)'}
+
+              {this.state.reporting && (
+                <i className="fa fa-spinner fa-spin" />
+              )}
+            </button>}
+          </div>
+        </div>}
+
         <div className="row margin-top">
           <div className="col-xs-12">
-            <button className="btn btn-primary btn-block" disabled={this.state.loading}>
+            {!this.state.person.id && <button className="btn btn-primary btn-block" disabled={this.state.loading}>
               Salvar
               {this.state.loading && (
                 <i className="fa fa-spinner fa-spin" />
               )}
-            </button>
+            </button>}
             {this.state.error && !this.state.loading && (
               <div className="alert alert-danger" role="alert">
                 Não foi possível salvar este sobrevivente no momento, tente novamente mais tarde.

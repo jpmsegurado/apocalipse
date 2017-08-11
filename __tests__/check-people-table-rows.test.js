@@ -1,7 +1,7 @@
 import { mount } from 'enzyme'
 import React from 'react'
 import renderer from 'react-test-renderer';
-import People from '../pages/people';
+import Index from '../pages/index';
 
 const people = [
   {
@@ -71,8 +71,8 @@ const people = [
 ];
 
 describe('With Enzyme', () => {
-  it('Check table rows', () => {
-    const app = mount(<People itens={people}/>)
+  it('Check how many rows is rendered on table of people', () => {
+    const app = mount(<Index itens={people}/>)
     const len = app.find('tr.clickable').length;
     expect(len).toBe(2);
   })

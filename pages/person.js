@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
 import axios from 'axios';
-import Link from 'next/link';
 import values from '../providers/values';
 import Page from '../components/page';
 import PersonForm from '../components/person-form';
+import Loading from '../components/loading';
 
 export default class Person extends Component {
 
@@ -18,20 +18,21 @@ export default class Person extends Component {
         return newItem;
       });
       person.id = person.location.split('/').pop();
-
-      if (person.items && person.items.length === 0) {
-        person.items = [
-          { name: 'water', quantity: 0 },
-          { name: 'ammunition', quantity: 0 },
-          { name: 'food', quantity: 0 },
-          { name: 'medication', quantity: 0 },
-        ];
-      }
-
       return {
         person,
       };
     }));
+  }
+
+  constructor(props) {
+    super(props);
+    this.loadRoute = this.loadRoute.bind(this);
+    this.state = {};
+  }
+
+  loadRoute() {
+    this.setState({ loadingRoute: true });
+    window.location.href = '/';
   }
 
   render() {
@@ -45,13 +46,12 @@ export default class Person extends Component {
         <div className="page-header">
           <h4>
             Informações do sobrevivente
-            <Link href="/people">
-              <button className="btn btn-link pull-right">Voltar para o início</button>
-            </Link>
+            <button onClick={this.loadRoute} className="btn btn-link pull-right">Voltar para o início</button>
           </h4>
         </div>
         <PersonForm person={this.props.person} />
       </div>
+      {this.state.loadingRoute && <Loading />}
     </Page>);
   }
 }

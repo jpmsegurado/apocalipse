@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
 import axios from 'axios';
 import Link from 'next/link';
-import values from '../values';
+import values from '../providers/values';
 import Page from '../components/page';
+import User from '../providers/user';
 
 const aliases = values.aliases;
 
@@ -23,8 +24,10 @@ export default class Trade extends Component {
 
   constructor(props) {
     super(props);
+    this.userService = new User();
     this.state = {
       person: props.person,
+      user: {},
       itemsUser: {
         water: 0,
         ammunition: 0,
@@ -41,10 +44,19 @@ export default class Trade extends Component {
     this.changePersonItem = this.changePersonItem.bind(this);
     this.changeUserItem = this.changeUserItem.bind(this);
     this.tradeItems = this.tradeItems.bind(this);
+    this.changedInput = this.changedInput.bind(this);
+    this.getUser = this.getUser.bind(this);
+    this.clearUser = this.clearUser.bind(this);
   }
 
-  componentDidMount() {
-    this.loadUser();
+  getUser() {
+    this.setState({ loadingUser: true, errorUser: false, user: {} });
+    this.userService.getFullInfo(this.state.searchId).then((res) => {
+      this.setState({ loadingUser: false, user: res.person });
+    }, (err) => {
+      console.log(err);
+      this.setState({ loadingUser: false, errorUser: true });
+    });
   }
 
   getUserPoints() {
@@ -59,6 +71,11 @@ export default class Trade extends Component {
     (this.state.itemsPerson.food * 3) +
     (this.state.itemsPerson.medication * 2) +
     this.state.itemsPerson.ammunition;
+  }
+
+  changedInput(event) {
+    const searchId = event.target.value;
+    this.setState({ searchId });
   }
 
   changeUserItem(event) {
@@ -81,31 +98,28 @@ export default class Trade extends Component {
     return !(userPoints > 0 && personPoints > 0 && userPoints === personPoints);
   }
 
-  loadUser() {
-    let user = window.localStorage.getItem('user');
-    if (user) user = JSON.parse(user);
-    axios.get(`${values.baseUrl}api/people/${user.id}/properties.json`).then((res) => {
-      user.items = res.data;
-      this.setState({ user });
-    });
+  clearUser() {
+    this.setState({ errorUser: false, user: {} });
   }
+
+  capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1)
 
   tradeItems() {
     let personStr = '';
     let userStr = '';
 
     Object.keys(this.state.itemsPerson).forEach((prop) => {
-      personStr = `${personStr}${prop}:${this.state.itemsPerson[prop]};`;
+      if (this.state.itemsPerson[prop] > 0) personStr = `${personStr}${this.capitalizeFirstLetter(prop)}:${this.state.itemsPerson[prop]};`;
     });
 
     Object.keys(this.state.itemsUser).forEach((prop) => {
-      userStr = `${userStr}${prop}:${this.state.itemsUser[prop]};`;
+      if (this.state.itemsUser[prop] > 0) userStr = `${userStr}${this.capitalizeFirstLetter(prop)}:${this.state.itemsUser[prop]};`;
     });
 
     const params = {
       'consumer[name]': this.state.person.name,
-      'consumer[pick]': personStr,
-      'consumer[payment]': userStr,
+      'consumer[pick]': personStr.slice(0, -1),
+      'consumer[payment]': userStr.slice(0, -1),
     };
 
     this.setState({ loading: true, error: false, success: false });
@@ -180,42 +194,72 @@ export default class Trade extends Component {
           </div>
 
           <div className="col-xs-6">
-            <h4>Seu inventório</h4>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Nome</th>
-                  <th>Quantidade para troca</th>
-                </tr>
-              </thead>
-              <tbody>
-                {!!this.state.user && this.state.user.items.map(item => (
-                  <tr key={item.item.name}>
-                    <td>
-                      <span>
-                        {aliases[item.item.name.toLowerCase()]}
-                      </span>
-                    </td>
-                    <td>
-                      <input
-                        type="number"
-                        className={`form-control ${
-                            this.state.itemsUser[item.item.name.toLowerCase()] > parseInt(item.quantity, 0) ? 'error' : ''
-                        }`}
-                        name={item.item.name.toLowerCase()}
-                        value={this.state.itemsUser[item.item.name.toLowerCase()]}
-                        onChange={this.changeUserItem}
-                      />
 
-                      <span>de {item.quantity}</span>
-                    </td>
+            <h4>
+              Seu inventório
+              {this.state.user.id && <button type="button" onClick={this.clearUser} className="btn btn-primary btn-link pull-right">Trocar usuário</button>}
+            </h4>
+            {!this.state.user.id && <div>
+              <div className="form-group">
+                <label htmlFor="id">Seu ID</label>
+                <input
+                  className="form-control"
+                  type="text"
+                  id="id"
+                  placeholder="Informe seu id para realizar a troca"
+                  onChange={this.changedInput}
+                />
+              </div>
+
+              <button className="btn btn-primary btn-block" type="button" onClick={this.getUser} disabled={this.state.loadingUser}>
+                Carregar meus itens
+                {this.state.loadingUser && <i className="fa fa-spinner fa-spin" />}
+              </button>
+
+              {this.state.errorUser && <div className="alert alert-warning">
+                ID não encontrado
+              </div>}
+
+            </div>}
+
+            {this.state.user.id &&
+            <div>
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Quantidade para troca</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-            <p className="pontuacao">
-              Pontuação: {this.getUserPoints()}
-            </p>
+                </thead>
+                <tbody>
+                  {!!this.state.user && this.state.user.items.map(item => (
+                    <tr key={item.item.name}>
+                      <td>
+                        <span>
+                          {aliases[item.item.name.toLowerCase()]}
+                        </span>
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          className={`form-control ${
+                              this.state.itemsUser[item.item.name.toLowerCase()] > parseInt(item.quantity, 0) ? 'error' : ''
+                          }`}
+                          name={item.item.name.toLowerCase()}
+                          value={this.state.itemsUser[item.item.name.toLowerCase()]}
+                          onChange={this.changeUserItem}
+                        />
+
+                        <span>de {item.quantity}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="pontuacao">
+                Pontuação: {this.getUserPoints()}
+              </p>
+            </div>}
           </div>
 
           <div className="col-xs-6">
@@ -258,13 +302,13 @@ export default class Trade extends Component {
             </p>
           </div>
 
-          <div className="col-xs-12">
+          {this.state.user.id && <div className="col-xs-12">
             <button type="button" onClick={this.tradeItems} className="btn btn-primary btn-block primary" disabled={this.canEnable() || this.state.loading}>
               Confirmar troca
               {this.state.loading &&
               <i className="fa fa-spin fa-spinner" />}
             </button>
-          </div>
+          </div>}
 
           {this.state.success &&
           <div className="col-xs-12">
@@ -294,5 +338,5 @@ export default class Trade extends Component {
 }
 
 Trade.propTypes = {
-  person: PropTypes.instanceOf(PropTypes.object),
+  person: PropTypes.objectOf(PropTypes.any),
 };
