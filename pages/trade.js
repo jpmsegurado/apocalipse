@@ -4,7 +4,7 @@ import axios from 'axios';
 import Link from 'next/link';
 import User from '../providers/user';
 import Page from '../components/page';
-import User from '../providers/user';
+import values from '../providers/values';
 
 const aliases = values.aliases;
 
@@ -258,7 +258,7 @@ export default class Trade extends Component {
 
           <div className="col-xs-6">
             <h4>Inventório de {this.state.person.name}</h4>
-            <table className="table">
+            <table className="table table-person">
               <thead>
                 <tr>
                   <th>Nome</th>
