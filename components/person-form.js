@@ -54,6 +54,8 @@ export default class PersonForm extends Component {
       lng = -45;
     }
     const canUpdate = (this.props.editing || !this.state.person.id);
+    console.log(this.props);
+    console.log(this.state);
     const center = { lat, lng };
     const map = new google.maps.Map(document.getElementById('map'), {
       center,

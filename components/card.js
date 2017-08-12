@@ -11,7 +11,7 @@ const CardDiv = styled.div`
 `;
 
 const Card = props => (
-  <CardDiv >
+  <CardDiv>
     {props.children}
   </CardDiv>
 );

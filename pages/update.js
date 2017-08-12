@@ -18,7 +18,7 @@ export default class Update extends Component {
 
   findUser() {
     this.setState({ loading: true, error: false });
-    this.userService.getFullInfo(this.state.searchId).then((res) => {
+    return this.userService.getFullInfo(this.state.searchId).then((res) => {
       this.setState({ loading: false, user: res.person });
     }, () => {
       this.setState({ loading: false, error: true });

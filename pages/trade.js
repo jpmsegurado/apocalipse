@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
 import axios from 'axios';
 import Link from 'next/link';
-import values from '../providers/values';
+import User from '../providers/user';
 import Page from '../components/page';
 import User from '../providers/user';
 
@@ -12,14 +12,8 @@ export default class Trade extends Component {
 
   static async getInitialProps(args) {
     if (!args.query.id) return { person: {} };
-
-    return axios.get(`${values.baseUrl}api/people/${args.query.id}.json`).then(resp => axios.get(`${values.baseUrl}api/people/${args.query.id}/properties.json`).then((res) => {
-      const person = resp.data;
-      person.items = res.data;
-      return {
-        person,
-      };
-    }));
+    this.userService = new User();
+    return await this.userService.getFullInfo(args.query.id);
   }
 
   constructor(props) {
@@ -224,7 +218,7 @@ export default class Trade extends Component {
 
             {this.state.user.id &&
             <div>
-              <table className="table">
+              <table className="table table-user">
                 <thead>
                   <tr>
                     <th>Nome</th>

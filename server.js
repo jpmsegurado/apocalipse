@@ -11,11 +11,13 @@ app.prepare()
   const server = express()
 
   server.get('/person/:id', (req, res) => {
-    app.render(req, res, '/person', Object.assign({}, req.query, { id: req.params.id }))
+    const id = req.params.id;
+    app.render(req, res, '/person', Object.assign({}, req.query, { id: id ? id : null }))
   })
 
   server.get('/update/:id', (req, res) => {
-    app.render(req, res, '/update', Object.assign({}, req.query, { id: req.params.id }))
+    const id = req.params.id;
+    app.render(req, res, '/update', Object.assign({}, req.query, { id: id ? id : null }))
   })
 
   server.get('*', (req, res) => {
