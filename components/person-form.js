@@ -36,7 +36,7 @@ export default class PersonForm extends Component {
 
   componentDidMount() {
     setTimeout(() => {
-      if (!this.state.person.id || this.state.person.id === this.state.user.id) this.loadMap();
+      this.loadMap();
     }, 1000);
   }
 
@@ -53,7 +53,7 @@ export default class PersonForm extends Component {
       lat = -19;
       lng = -45;
     }
-
+    const canUpdate = (this.props.editing || !this.state.person.id);
     const center = { lat, lng };
     const map = new google.maps.Map(document.getElementById('map'), {
       center,
@@ -62,30 +62,34 @@ export default class PersonForm extends Component {
     const marker = new google.maps.Marker({
       map,
       position: center,
-      draggable: true,
+      draggable: canUpdate,
     });
 
-    map.addListener('center_changed', () => {
-      const newCenter = { lat: map.getCenter().lat(), lng: map.getCenter().lng() };
-      marker.setPosition(newCenter);
-      const newLatLng = `point(${newCenter.lat} ${newCenter.lng})`;
-      const person = Object.assign({}, this.state.person, { lonlat: newLatLng });
-      this.setState({ person });
-    });
+    if (canUpdate) {
+      map.addListener('center_changed', () => {
+        const newCenter = { lat: map.getCenter().lat(), lng: map.getCenter().lng() };
+        marker.setPosition(newCenter);
+        const newLatLng = `point(${newCenter.lat} ${newCenter.lng})`;
+        const person = Object.assign({}, this.state.person, { lonlat: newLatLng });
+        this.setState({ person });
+      });
+    }
   }
 
   handleInputChange(event) {
-    const target = event.target;
-    let value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = target.name;
+    if (!this.props.editing) {
+      const target = event.target;
+      let value = target.type === 'checkbox' ? target.checked : target.value;
+      const name = target.name;
 
-    if (name === 'age') value = parseInt(value, 0);
+      if (name === 'age') value = parseInt(value, 0);
 
-    const person = Object.assign({}, this.state.person, { [name]: value });
+      const person = Object.assign({}, this.state.person, { [name]: value });
 
-    this.setState({
-      person,
-    });
+      this.setState({
+        person,
+      });
+    }
   }
 
   handleItemChange(event) {
@@ -117,7 +121,7 @@ export default class PersonForm extends Component {
     this.setState({ loading: true, error: false, success: false });
     if (this.state.person.id) {
       return axios.patch(`${values.baseUrl}api/people/${this.props.person.id}.json`, this.state.person).then(() => {
-        this.setState({ loading: false, success: true });
+        this.setState({ loading: false, success: true, loadingRoute: true });
         window.location.href = '/';
       }, () => {
         this.setState({ loading: false, error: true });
@@ -127,7 +131,7 @@ export default class PersonForm extends Component {
     person.items = person.items.map(elem => `${this.capitalizeFirstLetter(elem.name)}:${elem.quantity}`).join(';');
 
     return axios.post(`${values.baseUrl}api/people.json`, person).then(() => {
-      this.setState({ loading: false, success: true });
+      this.setState({ loading: false, success: true, loadingRoute: true });
       window.location.href = '/';
     }, () => {
       this.setState({ loading: false, error: true });
@@ -228,6 +232,7 @@ export default class PersonForm extends Component {
                   onChange={this.handleInputChange}
                   name="gender"
                   value="M"
+                  readOnly={this.props.editing}
                   checked={this.state.person.gender === 'M'}
                 />
                 Masculino
@@ -309,18 +314,22 @@ export default class PersonForm extends Component {
         </div>
 
 
-        {(!this.state.person.id || this.state.person.id === this.state.user.id) &&
-          <div className="row">
-            <div className="col-xs-12">
-              <div id="map" />
-            </div>
-          </div>}
+        <div className="row">
+          <div className="col-xs-12">
+            <div id="map" />
+          </div>
+        </div>
 
         {this.state.person['infected?'] && <div className="alert alert-danger">
           Este sobrevivente está infectado!
         </div>}
 
-        {(this.state.person.id && this.state.user.id !== this.state.person.id && !this.state.person['infected?']) &&
+        {(
+        this.state.person.id &&
+        this.state.user.id !== this.state.person.id &&
+        !this.state.person['infected?'] &&
+        !this.props.editing
+        ) &&
         <div className="row infected">
           <div className="col-xs-12">
             {<button className="btn btn-primary btn-block" type="button" onClick={this.reportInfection}>
@@ -336,7 +345,8 @@ export default class PersonForm extends Component {
 
         <div className="row margin-top">
           <div className="col-xs-12">
-            {!this.state.person.id && <button className="btn btn-primary btn-block" disabled={this.state.loading}>
+            {(!this.state.person.id || this.props.editing) &&
+            <button className="btn btn-primary btn-block" disabled={this.state.loading}>
               Salvar
               {this.state.loading && (
                 <i className="fa fa-spinner fa-spin" />
@@ -364,4 +374,5 @@ export default class PersonForm extends Component {
 
 PersonForm.propTypes = {
   person: PropTypes.objectOf(PropTypes.any),
+  editing: PropTypes.bool,
 };

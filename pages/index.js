@@ -47,6 +47,7 @@ export default class Index extends Component {
     this.changeSearch = this.changeSearch.bind(this);
     this.getFilteredItens = this.getFilteredItens.bind(this);
     this.onRowClick = this.onRowClick.bind(this);
+    this.goToUpdate = this.goToUpdate.bind(this);
   }
 
   onRowClick(row) {
@@ -62,6 +63,11 @@ export default class Index extends Component {
       const removedSpecial = this.removeSpecialChars(item.name).toLowerCase();
       return removedSpecial.indexOf(search) > -1 || item.age === parseInt(search, 0);
     });
+  }
+
+  goToUpdate() {
+    window.location.href = '/update';
+    this.setState({ loadingRoute: true });
   }
 
   removeSpecialChars = (s) => {
@@ -119,14 +125,9 @@ export default class Index extends Component {
         <div className="page-header">
           <h4>
             Sobreviventes
-            {
-              this.state.user &&
-              <Link href={`/person?id=${this.state.user.id}`} as={`/person/${this.state.user.id}`}>
-                <button className="btn btn-link pull-right">
-                  Ver meu perfil
-                </button>
-              </Link>
-            }
+            <button onClick={this.goToUpdate} className="btn btn-link pull-right">
+                Ver meu perfil
+              </button>
             <span className="pull-right" />
 
           </h4>
