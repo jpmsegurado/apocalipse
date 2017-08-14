@@ -11,10 +11,6 @@ Assumindo que já possua o `npm` instalado, basta clonar este repositório, e ro
 
 Para rodar a aplicação use o comando `npm run dev` que o `next.js` irá criar um servidor local que faz server side rendering.
 
-Na pasta `__tests__` possuem 3 arquivos de teste: 
-- `check-people-table-rows.test.js`: testa se o componente de tabela renderiza o número certo de pessoas
-- `empty-inventory-person.test.js`: testa se a página de visualização de uma pessoa sem itens de inventório renderiza o aviso que a mesma tem o inventório vazio.
-- `person-with-items.test.js`: testa se a página de visualização de uma pessoa renderiza uma tabela com os 4 tipos de itens de inventório.
 
 # Avisos importantes
 
