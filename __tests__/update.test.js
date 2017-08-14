@@ -11,3 +11,11 @@ describe('With Enzyme', () => {
     expect(app.find('#name').node.value).toEqual(noInventoryUser.name);
   });
 });
+
+describe('With Enzyme', () => {
+  it("Check if name of the user will be rendered", () => {
+    const app = mount(<Update/>);
+    app.setState({ user: noInventoryUser });
+    expect(app.find('table tbody tr').length).toBe(0);
+  });
+});
