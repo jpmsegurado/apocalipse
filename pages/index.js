@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
 import axios from 'axios';
 import Link from 'next/link';
+import Router from 'next/router';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import Page from '../components/page';
 import Loading from '../components/loading';
@@ -51,7 +52,8 @@ export default class Index extends Component {
   }
 
   onRowClick(row) {
-    window.location.href = `/person/${row.location.split('/').pop()}`;
+    const id = row.location.split('/').pop();
+    Router.push(`/person?id=${id}`, `/person/${id}`);
     this.setState({ loadingRoute: true });
   }
 
@@ -66,7 +68,7 @@ export default class Index extends Component {
   }
 
   goToUpdate() {
-    window.location.href = '/update';
+    Router.push('/update');
     this.setState({ loadingRoute: true });
   }
 

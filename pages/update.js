@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Page from '../components/page';
+import Router from 'next/router';
 import Loading from '../components/loading';
 import PersonForm from '../components/person-form';
 import User from '../providers/user';
@@ -32,7 +33,7 @@ export default class Update extends Component {
 
   goBack() {
     this.setState({ loadingRoute: true });
-    window.location.href = '/';
+    Router.push('/');
   }
 
   render() {

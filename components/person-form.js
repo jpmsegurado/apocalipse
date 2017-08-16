@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
 import axios from 'axios';
+import Router from 'next/router';
 import styled from 'styled-components';
 import values from '../providers/values';
 import Loading from '../components/loading';
@@ -124,7 +125,7 @@ export default class PersonForm extends Component {
     if (this.state.person.id) {
       return axios.patch(`${values.baseUrl}api/people/${this.props.person.id}.json`, this.state.person).then(() => {
         this.setState({ loading: false, success: true, loadingRoute: true });
-        window.location.href = '/';
+        Router.push('/');
       }, () => {
         this.setState({ loading: false, error: true });
       });
@@ -134,7 +135,7 @@ export default class PersonForm extends Component {
 
     return axios.post(`${values.baseUrl}api/people.json`, person).then(() => {
       this.setState({ loading: false, success: true, loadingRoute: true });
-      window.location.href = '/';
+      Router.push('/');
     }, () => {
       this.setState({ loading: false, error: true });
     });
@@ -142,7 +143,8 @@ export default class PersonForm extends Component {
 
   trade() {
     this.setState({ loadingRoute: true });
-    window.location.href = `/trade/${this.state.person.id}`;
+    const id = this.state.person.id;
+    Router.push(`/person?id=${id}`, `/person/${id}`);
   }
 
   render() {

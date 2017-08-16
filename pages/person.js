@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
+import Router from 'next/router';
 import User from '../providers/user';
 import Page from '../components/page';
 import PersonForm from '../components/person-form';
@@ -21,7 +22,7 @@ export default class Person extends Component {
 
   loadRoute() {
     this.setState({ loadingRoute: true });
-    window.location.href = '/';
+    Router.push('/');
   }
 
   render() {

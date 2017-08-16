@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
 import axios from 'axios';
 import Link from 'next/link';
+import Router from 'next/router';
 import User from '../providers/user';
 import Page from '../components/page';
 import values from '../providers/values';
@@ -121,7 +122,8 @@ export default class Trade extends Component {
     return axios.post(`${values.baseUrl}api/people/${this.state.user.id}/properties/trade_item.json`, params).then(() => {
       this.setState({ success: true });
       setTimeout(() => {
-        window.location.href = `/person/${this.state.person.id}`;
+        const id = this.state.person.id;
+        Router.push(`/person?id=${id}`, `/person/${id}`);
       }, 1000);
     }, () => {
       this.setState({ error: true, loading: false });
