@@ -3,13 +3,16 @@ import { PropTypes } from 'prop-types';
 import axios from 'axios';
 import Link from 'next/link';
 import Router from 'next/router';
+import { bindActionCreators } from 'redux';
+import withRedux from 'next-redux-wrapper';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import Page from '../components/page';
 import Loading from '../components/loading';
 import values from '../providers/values';
+import { initStore, addCount } from '../store';
 
 
-export default class Index extends Component {
+class Index extends Component {
 
   static async getInitialProps() {
     return axios.get(`${values.baseUrl}api/people.json`).then((resp) => {
@@ -178,3 +181,7 @@ export default class Index extends Component {
 Index.propTypes = {
   itens: PropTypes.arrayOf(PropTypes.object),
 };
+
+const mapDispatchToProps = (dispatch) => { add: bindActionCreators(addCount, dispatch); };
+
+export default withRedux(initStore, null, mapDispatchToProps)(Index);
