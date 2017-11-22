@@ -55,8 +55,10 @@ class Index extends Component {
   }
 
   onRowClick(row) {
-    const id = row.location.split('/').pop();
-    Router.push(`/person?id=${id}`, `/person/${id}`);
+    addCount(row);
+    this.setState({ loadingRoute: true });
+    // const id = row.location.split('/').pop();
+    // Router.push(`/person?id=${id}`, `/person/${id}`);
     this.setState({ loadingRoute: true });
   }
 

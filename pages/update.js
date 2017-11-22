@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import Page from '../components/page';
 import Router from 'next/router';
 import Loading from '../components/loading';
+import Page from '../components/page';
 import PersonForm from '../components/person-form';
 import User from '../providers/user';
 
