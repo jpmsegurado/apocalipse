@@ -1,28 +1,17 @@
-import { createStore, applyMiddleware } from 'redux';
-import { composeWithDevTools } from 'redux-devtools-extension';
-import thunkMiddleware from 'redux-thunk';
-
-const exampleInitialState = {
-  count: 0,
-};
-
-export const actionTypes = {
-  ADD: 'ADD',
-};
-
-// REDUCERS
-export const reducer = (state = exampleInitialState, action) => {
+import { createStore } from 'redux';
+// create a simple reducer
+const reducer = (state = { foo: '' }, action) => {
   switch (action.type) {
-    case actionTypes.ADD:
-      return Object.assign({}, state, {
-        count: state.count + 1,
-      });
-    default: return state;
+    case 'FOO':
+      return { ...state, foo: action.payload };
+    default:
+      return state;
   }
 };
+// actions
+export const changeFoo = foo => ({ type: 'FOO', payload: foo });
 
+// create a store creator
+const makeStore = initialState => createStore(reducer, initialState);
 
-export const addCount = dispatch => dispatch({ type: actionTypes.ADD });
-
-export const initStore = (initialState = exampleInitialState) =>
-  createStore(reducer, initialState, composeWithDevTools(applyMiddleware(thunkMiddleware)));
+export default makeStore;
